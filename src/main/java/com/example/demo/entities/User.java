@@ -58,17 +58,17 @@ public class User {
 	@Column(name = "avatar_url")
 	private String avatarUrl;
 	
-	@OneToOne
+	@OneToOne(cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
 	@JoinColumn(name = "account_id")
 	private Account account;
 	
-	@OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+	@OneToMany(mappedBy = "user", cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
 	private List<FriendShip> friendShips;
 	
-	@OneToMany(mappedBy = "friend", cascade = CascadeType.ALL)
+	@OneToMany(mappedBy = "friend", cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
 	private List<FriendShip> friendOf;
 	
-	@OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+	@OneToMany(mappedBy = "user", cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
 	private List<UserChatRoom> userChatRooms;
 	
 	@Column(name = "created_at")

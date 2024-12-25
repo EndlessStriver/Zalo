@@ -4,6 +4,7 @@ import java.time.LocalDateTime;
 
 import com.example.demo.entities.enums.FriendShipStatus;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
@@ -27,11 +28,11 @@ public class FriendShip {
 	@Column(name = "friend_ship_id")
 	private String friendShipId;
 	
-	@ManyToOne
+	@ManyToOne(cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
 	@JoinColumn(name = "user", nullable = false)
 	private User user;
 	
-	@ManyToOne
+	@ManyToOne(cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
 	@JoinColumn(name = "friend", nullable = false)
 	private User friend;
 	

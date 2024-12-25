@@ -1,9 +1,7 @@
 package com.example.demo.entities;
 
 import java.time.LocalDateTime;
-import java.util.List;
 
-import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.DiscriminatorColumn;
 import jakarta.persistence.DiscriminatorType;
@@ -11,7 +9,8 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.Inheritance;
 import jakarta.persistence.InheritanceType;
-import jakarta.persistence.OneToMany;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -23,24 +22,23 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table(name = "chat_room")
+@Table(name = "message")
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
 @DiscriminatorColumn(name = "type", discriminatorType = DiscriminatorType.STRING)
-public abstract class ChatRoom {
+public abstract class Message {
 	
 	@Id
-	@Column(name = "chat_room_id")
-	private String chatRoomId;
+	@Column(name = "message_id")
+	private String messageId;
 	
-	@Column(name = "is_group")
-	private Boolean group;
+	@ManyToOne
+	@JoinColumn(name = "user_id")
+	private User user;
 	
-	@OneToMany(mappedBy = "chatRoom", cascade = CascadeType.ALL)
-	private List<UserChatRoom> userChatRooms;
+	@ManyToOne
+	@JoinColumn(name = "chat_room")
+	private ChatRoom chatRoom;
 	
-	@Column(name = "created_at")
-	private LocalDateTime createdAt;
-	
-	@Column(name = "updated_at")
-	private LocalDateTime updatedAt;
+	@Column(name = "timestamp")
+	private LocalDateTime timestamp;
 }

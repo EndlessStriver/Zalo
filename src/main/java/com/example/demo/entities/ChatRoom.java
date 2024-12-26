@@ -1,6 +1,7 @@
 package com.example.demo.entities;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 import jakarta.persistence.CascadeType;
@@ -36,7 +37,7 @@ public abstract class ChatRoom {
 	private Boolean group;
 	
 	@OneToMany(mappedBy = "chatRoom", cascade = CascadeType.ALL)
-	private List<UserChatRoom> userChatRooms;
+	private List<UserChatRoom> userChatRooms = new ArrayList<UserChatRoom>();
 	
 	@Column(name = "created_at")
 	private LocalDateTime createdAt;

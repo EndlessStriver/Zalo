@@ -5,6 +5,7 @@ import java.util.List;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.example.demo.dto.LoginRequest;
@@ -13,19 +14,26 @@ import com.example.demo.entities.Account;
 import com.example.demo.entities.User;
 import com.example.demo.entities.enums.RoleAccount;
 import com.example.demo.exception.AuthenticationException;
+import com.example.demo.exception.ConflictException;
 import com.example.demo.exception.ResourceNotFoundException;
 import com.example.demo.repository.AccountRepository;
+import com.example.demo.repository.UserRepository;
 import com.example.demo.service.AccountService;
 
 @Service
 public class AccountServiceImp implements AccountService {
 	
 	private AccountRepository accountRepository;
+	private UserRepository userRepository;
 	private AuthenticationManager authenticationManager;
+	private BCryptPasswordEncoder bCryptPasswordEncoder;
 	
-	public AccountServiceImp(AccountRepository accountRepository, AuthenticationManager authenticationManager) {
+	public AccountServiceImp(AccountRepository accountRepository, UserRepository userRepository,
+			AuthenticationManager authenticationManager, BCryptPasswordEncoder bCryptPasswordEncoder) {
 		this.accountRepository = accountRepository;
+		this.userRepository = userRepository;
 		this.authenticationManager = authenticationManager;
+		this.bCryptPasswordEncoder = bCryptPasswordEncoder;
 	}
 
 	@Override
@@ -58,9 +66,14 @@ public class AccountServiceImp implements AccountService {
 
 	@Override
 	public Account register(RegisterRequest registerRequest) {
+		
+		boolean emailExist = userRepository.checkEmailIsExists(registerRequest.getEmail());
+		
+		if(emailExist) throw new ConflictException("Email đã tồn tại!");
+		
 		Account account = new Account();
 		account.setUsername(registerRequest.getUsername());
-		account.setPassword(registerRequest.getPassword());
+		account.setPassword(bCryptPasswordEncoder.encode(registerRequest.getPassword()));
 		account.setRole(RoleAccount.USER);
 		
 		User user = new User();

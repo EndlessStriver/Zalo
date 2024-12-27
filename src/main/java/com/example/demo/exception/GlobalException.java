@@ -28,4 +28,15 @@ public class GlobalException {
 				.body(new ResponseError(HttpStatus.UNAUTHORIZED.value(), ex.getMessage()));
 	}
 	
+	@ExceptionHandler(AuthorizationException.class)
+	public ResponseEntity<?> handleAuthorizationException(AuthorizationException ex) {
+		return ResponseEntity.status(HttpStatus.FORBIDDEN)
+				.body(new ResponseError(HttpStatus.FORBIDDEN.value(), ex.getMessage()));
+	}
+	
+	@ExceptionHandler(ConflictException.class)
+	public ResponseEntity<?> handleConflictException(ConflictException ex) {
+		return ResponseEntity.status(HttpStatus.CONFLICT)
+				.body(new ResponseError(HttpStatus.CONFLICT.value(), ex.getMessage()));
+	}
 }

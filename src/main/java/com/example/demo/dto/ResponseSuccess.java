@@ -13,6 +13,12 @@ public class ResponseSuccess<T> {
 	private String message;
 	private T data;
 	
+	public ResponseSuccess(int code, String message) {
+		this.status = "success";
+		this.code = code;
+		this.message = message;
+	}
+	
 	public ResponseSuccess(int code, String message, T data) {
 		this.status = "success";
 		this.code = code;

@@ -1,5 +1,7 @@
 package com.example.demo.service.imp;
 
+import java.util.concurrent.TimeUnit;
+
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
@@ -27,6 +29,11 @@ public class RedisServiceImp implements RedisService {
 	@Override
 	public Object get(String key) {
 		return redisTemplate.opsForValue().get(key);
+	}
+
+	@Override
+	public void saveDataWithTTL(String key, Object value, int ttl) {
+		redisTemplate.opsForValue().set(key, value, ttl, TimeUnit.SECONDS);
 	}
 
 }

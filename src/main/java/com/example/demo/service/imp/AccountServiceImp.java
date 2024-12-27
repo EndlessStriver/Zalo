@@ -88,4 +88,22 @@ public class AccountServiceImp implements AccountService {
 		
 		return accountRepository.save(account);
 	}
+
+	@Override
+	public boolean checkAccountIsVerify(boolean verify, String email) {
+		return accountRepository.checkAccountIsVerify(verify, email);
+	}
+
+	@Override
+	public Account getAccountByEmail(String email) {
+		return accountRepository.getAccountByEmail(email).orElse(null);
+	}
+
+	@Override
+	public void verifyAccountWithEmail(String email) {
+		Account account = accountRepository.getAccountByEmail(email).orElse(null);
+		if(account == null) throw new ResourceNotFoundException("Không tìm thấy tài khoản với email là: " + email);
+		account.setVerified(true);
+		accountRepository.save(account);
+	}
 }

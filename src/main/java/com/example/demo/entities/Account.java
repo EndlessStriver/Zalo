@@ -45,7 +45,7 @@ public class Account {
 	private RoleAccount role;
 	
 	@Column(name = "is_active")
-	private boolean active;
+	private boolean actived;
 	
 	@Column(name = "is_verified")
 	private boolean verified;
@@ -64,7 +64,7 @@ public class Account {
 		this.accountId = UUID.randomUUID().toString();
 		this.createdAt = LocalDateTime.now();
 		this.updatedAt = LocalDateTime.now();
-		this.active = true;
+		this.actived = true;
 		this.verified = false;
 	}
 	

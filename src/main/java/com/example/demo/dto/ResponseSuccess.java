@@ -1,17 +1,13 @@
 package com.example.demo.dto;
 
-import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 
 @Data
-@NoArgsConstructor
-@AllArgsConstructor
-public class ResponseSuccess<T> {
+public class ResponseSuccess {
+	
 	private String status;
 	private int code;
 	private String message;
-	private T data;
 	
 	public ResponseSuccess(int code, String message) {
 		this.status = "success";
@@ -19,10 +15,4 @@ public class ResponseSuccess<T> {
 		this.message = message;
 	}
 	
-	public ResponseSuccess(int code, String message, T data) {
-		this.status = "success";
-		this.code = code;
-		this.message = message;
-		this.data = data;
-	}
 }

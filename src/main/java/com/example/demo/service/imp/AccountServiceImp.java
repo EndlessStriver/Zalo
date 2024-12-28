@@ -12,6 +12,7 @@ import com.example.demo.dto.LoginRequest;
 import com.example.demo.dto.RegisterRequest;
 import com.example.demo.entities.Account;
 import com.example.demo.entities.User;
+import com.example.demo.entities.enums.Gender;
 import com.example.demo.entities.enums.RoleAccount;
 import com.example.demo.exception.AuthenticationException;
 import com.example.demo.exception.ConflictException;
@@ -79,7 +80,7 @@ public class AccountServiceImp implements AccountService {
 		User user = new User();
 		user.setFirstName(registerRequest.getFirstName());
 		user.setLastName(registerRequest.getLastName());
-		user.setGender(registerRequest.getGender());
+		user.setGender(Gender.valueOf(registerRequest.getGender()));
 		user.setBirthday(registerRequest.getBirthday());
 		user.setEmail(registerRequest.getEmail());
 		user.setAccount(account);

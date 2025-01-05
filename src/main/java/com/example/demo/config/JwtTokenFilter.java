@@ -13,8 +13,8 @@ import org.springframework.util.PathMatcher;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import com.example.demo.exception.AuthorizationException;
+import com.example.demo.service.JwtService;
 import com.example.demo.service.MyUserDetailService;
-import com.example.demo.util.JwtUtil;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import jakarta.servlet.FilterChain;
@@ -26,11 +26,11 @@ import jakarta.servlet.http.HttpServletResponse;
 public class JwtTokenFilter extends OncePerRequestFilter {
 
 	private MyUserDetailService myUserDetailsService;
-	private JwtUtil jwtUtil;
+	private JwtService jwtService;
 
-	public JwtTokenFilter(MyUserDetailService myUserDetailsService, JwtUtil jwtUtil) {
+	public JwtTokenFilter(MyUserDetailService myUserDetailsService, JwtService jwtService) {
 		this.myUserDetailsService = myUserDetailsService;
-		this.jwtUtil = jwtUtil;
+		this.jwtService = jwtService;
 	}
 
 	@Override
@@ -52,14 +52,14 @@ public class JwtTokenFilter extends OncePerRequestFilter {
 
 			if (authorizationHeader != null && authorizationHeader.startsWith("Bearer ")) {
 				jwt = authorizationHeader.substring(7);
-				username = jwtUtil.extractUsername(jwt);
+				username = jwtService.extractUsername(jwt);
 			} else {
 				throw new AuthorizationException("Token không hợp lệ hoặc đã hết hạn");
 			}
 
 			if (username != null) {
 				UserDetails userDetails = myUserDetailsService.loadUserByUsername(username);
-				if (jwtUtil.validateToken(jwt, userDetails.getUsername())) {
+				if (jwtService.validateToken(jwt, userDetails.getUsername())) {
 					UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken = new UsernamePasswordAuthenticationToken(
 							userDetails, null, userDetails.getAuthorities());
 					SecurityContextHolder.getContext().setAuthentication(usernamePasswordAuthenticationToken);

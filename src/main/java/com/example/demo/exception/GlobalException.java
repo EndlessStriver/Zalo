@@ -7,6 +7,9 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 
 import com.example.demo.dto.ResponseError;
 
+import io.jsonwebtoken.ExpiredJwtException;
+import io.jsonwebtoken.security.SignatureException;
+
 @ControllerAdvice
 public class GlobalException {
 	
@@ -39,5 +42,23 @@ public class GlobalException {
 	public ResponseEntity<?> handleConflictException(ConflictException ex) {
 		return ResponseEntity.status(HttpStatus.CONFLICT)
 				.body(new ResponseError(HttpStatus.CONFLICT.value(), ex.getMessage()));
+	}
+	
+	@ExceptionHandler(BadRequestException.class)
+	public ResponseEntity<?> handleConflictException(BadRequestException ex) {
+		return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+				.body(new ResponseError(HttpStatus.BAD_REQUEST.value(), ex.getMessage()));
+	}
+	
+	@ExceptionHandler(ExpiredJwtException.class)
+	public ResponseEntity<?> handleConflictException(ExpiredJwtException ex) {
+		return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+				.body(new ResponseError(HttpStatus.BAD_REQUEST.value(), ex.getMessage()));
+	}
+	
+	@ExceptionHandler(SignatureException.class)
+	public ResponseEntity<?> handleConflictException(SignatureException ex) {
+		return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+				.body(new ResponseError(HttpStatus.BAD_REQUEST.value(), ex.getMessage()));
 	}
 }

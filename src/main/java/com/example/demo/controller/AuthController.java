@@ -7,8 +7,10 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -16,16 +18,18 @@ import com.example.demo.dto.EmailRequest;
 import com.example.demo.dto.LoginRequest;
 import com.example.demo.dto.LoginResponse;
 import com.example.demo.dto.OTPRequest;
+import com.example.demo.dto.RefreshTokenResponse;
 import com.example.demo.dto.RegisterRequest;
 import com.example.demo.dto.ResponseDataSuccess;
 import com.example.demo.dto.ResponseError;
 import com.example.demo.dto.ResponseErrorForm;
 import com.example.demo.dto.ResponseSuccess;
 import com.example.demo.entities.Account;
+import com.example.demo.entities.enums.TokenType;
 import com.example.demo.service.AccountService;
 import com.example.demo.service.EmailService;
+import com.example.demo.service.JwtService;
 import com.example.demo.service.RedisService;
-import com.example.demo.util.JwtUtil;
 
 import jakarta.mail.MessagingException;
 import jakarta.validation.Valid;
@@ -37,17 +41,17 @@ public class AuthController {
 	private AccountService accountService;
 	private EmailService emailService;
 	private RedisService redisService;
-	private JwtUtil jwtUtil;
+	private JwtService jwtService;
 
 	@Value("${spring.mail.username}")
 	private String emailSystem;
 
 	public AuthController(AccountService accountService, EmailService emailService, RedisService redisService,
-			JwtUtil jwtUtil) {
+			JwtService jwtService) {
 		this.accountService = accountService;
 		this.emailService = emailService;
 		this.redisService = redisService;
-		this.jwtUtil = jwtUtil;
+		this.jwtService = jwtService;
 	}
 
 	@PostMapping("/login")
@@ -142,12 +146,22 @@ public class AuthController {
 		return ResponseEntity.status(HttpStatus.OK)
 				.body(new ResponseSuccess(HttpStatus.OK.value(), "Xác thực tài khoản thành công"));
 	}
+	
+	@GetMapping("/refresh-token")
+	public ResponseEntity<?> refreshToken(@RequestHeader("Authorization") String refreshTokenHeader) {
+		String refreshToken = refreshTokenHeader.substring(7);
+		String accessToken = jwtService.refreshToken(refreshToken);
+		RefreshTokenResponse refreshTokenResponse = new RefreshTokenResponse(accessToken);
+		return ResponseEntity.status(HttpStatus.OK).body(new ResponseDataSuccess<RefreshTokenResponse>(
+				HttpStatus.OK.value(), "Làm mới access token thành công", refreshTokenResponse));
+	}
 
 	private int generateOTP() {
 		return (int) (Math.floor((Math.random() * 900000)) + 100000);
 	}
 
 	private LoginResponse convertAccountToLoginResponse(Account account) {
+
 		LoginResponse loginResponse = new LoginResponse();
 		loginResponse.setAccountId(account.getAccountId());
 		loginResponse.setUsername(account.getUsername());
@@ -157,7 +171,8 @@ public class AuthController {
 		loginResponse.setUser(account.getUser());
 		loginResponse.setCreatedAt(account.getCreatedAt());
 		loginResponse.setUpdatedAt(account.getUpdatedAt());
-		loginResponse.setToken(jwtUtil.generateToken(account.getUsername()));
+		loginResponse.setAccessToken(jwtService.generateToken(account.getUsername(), TokenType.ACCESS));
+		loginResponse.setRefreshToken(jwtService.generateToken(account.getUsername(), TokenType.REFRESH));
 
 		return loginResponse;
 	}

@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.example.demo.dto.EmailRequest;
 import com.example.demo.dto.LoginRequest;
+import com.example.demo.dto.LoginResponse;
 import com.example.demo.dto.OTPRequest;
 import com.example.demo.dto.RegisterRequest;
 import com.example.demo.dto.ResponseDataSuccess;
@@ -24,6 +25,7 @@ import com.example.demo.entities.Account;
 import com.example.demo.service.AccountService;
 import com.example.demo.service.EmailService;
 import com.example.demo.service.RedisService;
+import com.example.demo.util.JwtUtil;
 
 import jakarta.mail.MessagingException;
 import jakarta.validation.Valid;
@@ -35,14 +37,17 @@ public class AuthController {
 	private AccountService accountService;
 	private EmailService emailService;
 	private RedisService redisService;
+	private JwtUtil jwtUtil;
 
 	@Value("${spring.mail.username}")
 	private String emailSystem;
 
-	public AuthController(AccountService accountService, EmailService emailService, RedisService redisService) {
+	public AuthController(AccountService accountService, EmailService emailService, RedisService redisService,
+			JwtUtil jwtUtil) {
 		this.accountService = accountService;
 		this.emailService = emailService;
 		this.redisService = redisService;
+		this.jwtUtil = jwtUtil;
 	}
 
 	@PostMapping("/login")
@@ -58,13 +63,15 @@ public class AuthController {
 					.body(new ResponseErrorForm(HttpStatus.BAD_REQUEST.value(), "Đăng nhập thất bại", errors));
 		}
 
-		return ResponseEntity.status(HttpStatus.OK).body(new ResponseDataSuccess<Account>(HttpStatus.OK.value(),
-				"Đăng nhập thành công", accountService.login(loginRequest)));
+		Account account = accountService.login(loginRequest);
+
+		return ResponseEntity.status(HttpStatus.OK).body(new ResponseDataSuccess<LoginResponse>(HttpStatus.OK.value(),
+				"Đăng nhập thành công", convertAccountToLoginResponse(account)));
 	}
 
 	@PostMapping("/register")
 	public ResponseEntity<?> register(@Valid @RequestBody RegisterRequest registerRequest, BindingResult result) {
-		
+
 		if (result.hasErrors()) {
 			Map<String, String> errors = new HashMap<String, String>();
 			result.getFieldErrors().stream().forEach(error -> {
@@ -74,14 +81,15 @@ public class AuthController {
 			return ResponseEntity.status(HttpStatus.BAD_REQUEST)
 					.body(new ResponseErrorForm(HttpStatus.BAD_REQUEST.value(), "Đăng kí thất bại", errors));
 		}
-		
+
 		return ResponseEntity.status(HttpStatus.OK).body(new ResponseDataSuccess<Account>(HttpStatus.OK.value(),
 				"Đăng ký thành công", accountService.register(registerRequest)));
 	}
 
 	@PostMapping("/send-otp")
-	public ResponseEntity<?> verify(@Valid @RequestBody EmailRequest emailRequest, BindingResult result) throws MessagingException {
-		
+	public ResponseEntity<?> verify(@Valid @RequestBody EmailRequest emailRequest, BindingResult result)
+			throws MessagingException {
+
 		if (result.hasErrors()) {
 			Map<String, String> errors = new HashMap<String, String>();
 			result.getFieldErrors().stream().forEach(error -> {
@@ -91,7 +99,7 @@ public class AuthController {
 			return ResponseEntity.status(HttpStatus.BAD_REQUEST)
 					.body(new ResponseErrorForm(HttpStatus.BAD_REQUEST.value(), "Gửi mã OTP thất bại", errors));
 		}
-		
+
 		Integer otp = generateOTP();
 		redisService.saveDataWithTTL(String.format("otp?email=%s", emailRequest.getEmail()), otp.toString(), 120);
 		emailService.sendEmailVerifyAccount(emailSystem, emailRequest.getEmail(), otp.toString());
@@ -101,7 +109,7 @@ public class AuthController {
 
 	@PostMapping("/verify-otp")
 	public ResponseEntity<?> verifyOTP(@Valid @RequestBody OTPRequest otpRequest, BindingResult result) {
-		
+
 		if (result.hasErrors()) {
 			Map<String, String> errors = new HashMap<String, String>();
 			result.getFieldErrors().stream().forEach(error -> {
@@ -137,6 +145,21 @@ public class AuthController {
 
 	private int generateOTP() {
 		return (int) (Math.floor((Math.random() * 900000)) + 100000);
+	}
+
+	private LoginResponse convertAccountToLoginResponse(Account account) {
+		LoginResponse loginResponse = new LoginResponse();
+		loginResponse.setAccountId(account.getAccountId());
+		loginResponse.setUsername(account.getUsername());
+		loginResponse.setRole(account.getRole());
+		loginResponse.setActived(account.isActived());
+		loginResponse.setVerified(account.isVerified());
+		loginResponse.setUser(account.getUser());
+		loginResponse.setCreatedAt(account.getCreatedAt());
+		loginResponse.setUpdatedAt(account.getUpdatedAt());
+		loginResponse.setToken(jwtUtil.generateToken(account.getUsername()));
+
+		return loginResponse;
 	}
 
 }

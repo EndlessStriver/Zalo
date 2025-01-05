@@ -103,7 +103,7 @@ public class AccountServiceImp implements AccountService {
 	@Override
 	public void verifyAccountWithEmail(String email) {
 		Account account = accountRepository.getAccountByEmail(email).orElse(null);
-		if(account == null) throw new ResourceNotFoundException("Không tìm thấy tài khoản với email là: " + email);
+		if(account == null) throw new ResourceNotFoundException("Không tìm thấy tài khoản liên kết với email: " + email);
 		account.setVerified(true);
 		accountRepository.save(account);
 	}

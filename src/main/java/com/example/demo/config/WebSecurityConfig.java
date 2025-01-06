@@ -63,6 +63,7 @@ public class WebSecurityConfig {
 			CorsConfiguration corsConfig = new CorsConfiguration();
 			corsConfig.setAllowedOrigins(Arrays.asList(EndPoint.ALLOWED_ORIGINS));
 			corsConfig.setAllowedMethods(Arrays.asList(EndPoint.ALLOWED_METHODS));
+			corsConfig.setAllowedHeaders(Arrays.asList(EndPoint.ALLOWED_HEADERS));
 			corsConfig.setAllowCredentials(true);
 			return corsConfig;
 		}));

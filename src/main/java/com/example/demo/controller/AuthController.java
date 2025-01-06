@@ -10,7 +10,6 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -26,12 +25,16 @@ import com.example.demo.dto.ResponseErrorForm;
 import com.example.demo.dto.ResponseSuccess;
 import com.example.demo.entities.Account;
 import com.example.demo.entities.enums.TokenType;
+import com.example.demo.exception.AuthenticationException;
 import com.example.demo.service.AccountService;
 import com.example.demo.service.EmailService;
 import com.example.demo.service.JwtService;
 import com.example.demo.service.RedisService;
 
 import jakarta.mail.MessagingException;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 
 @RestController
@@ -55,7 +58,8 @@ public class AuthController {
 	}
 
 	@PostMapping("/login")
-	public ResponseEntity<?> login(@Valid @RequestBody LoginRequest loginRequest, BindingResult result) {
+	public ResponseEntity<?> login(@Valid @RequestBody LoginRequest loginRequest, BindingResult result,
+			HttpServletResponse httpServletResponse) {
 
 		if (result.hasErrors()) {
 			Map<String, String> errors = new HashMap<String, String>();
@@ -68,6 +72,16 @@ public class AuthController {
 		}
 
 		Account account = accountService.login(loginRequest);
+
+		String refreshToken = jwtService.generateToken(account.getUsername(), TokenType.REFRESH);
+
+		Cookie cookie = new Cookie("refreshToken", refreshToken);
+		cookie.setHttpOnly(true);
+		cookie.setSecure(false); // đang không gửi qua https
+		cookie.setPath("/");
+		cookie.setMaxAge(1 * 24 * 60 * 60); // Tồn tại trong 1 ngày
+
+		httpServletResponse.addCookie(cookie);
 
 		return ResponseEntity.status(HttpStatus.OK).body(new ResponseDataSuccess<LoginResponse>(HttpStatus.OK.value(),
 				"Đăng nhập thành công", convertAccountToLoginResponse(account)));
@@ -146,10 +160,24 @@ public class AuthController {
 		return ResponseEntity.status(HttpStatus.OK)
 				.body(new ResponseSuccess(HttpStatus.OK.value(), "Xác thực tài khoản thành công"));
 	}
-	
+
 	@GetMapping("/refresh-token")
-	public ResponseEntity<?> refreshToken(@RequestHeader("Authorization") String refreshTokenHeader) {
-		String refreshToken = refreshTokenHeader.substring(7);
+	public ResponseEntity<?> refreshToken(HttpServletRequest httpServletRequest) throws AuthenticationException {
+		String refreshToken = null;
+		
+		if(httpServletRequest.getCookies() == null)
+			throw new AuthenticationException("Refresh Token không hợp lệ hoặc đã hết hạn");
+
+		for (Cookie cookie : httpServletRequest.getCookies()) {
+			if ("refreshToken".equals(cookie.getName())) {
+				refreshToken = cookie.getValue();
+				break;
+			}
+		}
+
+		if (refreshToken == null)
+			throw new AuthenticationException("Refresh Token không hợp lệ hoặc đã hết hạn");
+
 		String accessToken = jwtService.refreshToken(refreshToken);
 		RefreshTokenResponse refreshTokenResponse = new RefreshTokenResponse(accessToken);
 		return ResponseEntity.status(HttpStatus.OK).body(new ResponseDataSuccess<RefreshTokenResponse>(
@@ -172,7 +200,6 @@ public class AuthController {
 		loginResponse.setCreatedAt(account.getCreatedAt());
 		loginResponse.setUpdatedAt(account.getUpdatedAt());
 		loginResponse.setAccessToken(jwtService.generateToken(account.getUsername(), TokenType.ACCESS));
-		loginResponse.setRefreshToken(jwtService.generateToken(account.getUsername(), TokenType.REFRESH));
 
 		return loginResponse;
 	}

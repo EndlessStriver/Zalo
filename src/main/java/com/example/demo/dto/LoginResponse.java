@@ -22,5 +22,4 @@ public class LoginResponse {
 	private LocalDateTime createdAt;
 	private LocalDateTime updatedAt;
 	private String accessToken;
-	private String refreshToken;
 }

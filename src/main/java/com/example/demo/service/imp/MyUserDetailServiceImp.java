@@ -13,7 +13,7 @@ import com.example.demo.service.MyUserDetailService;
 
 @Service
 public class MyUserDetailServiceImp implements MyUserDetailService {
-	
+
 	private AccountRepository accountRepository;
 
 	public MyUserDetailServiceImp(AccountRepository accountRepository) {
@@ -24,12 +24,11 @@ public class MyUserDetailServiceImp implements MyUserDetailService {
 	@Override
 	public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
 		Account account = accountRepository.getAccountByUsername(username).orElse(null);
-		if(account == null) throw new ResourceNotFoundException("Không thể tìm thấy tài khoản với tên đăng nhập là: " + username);
+		if (account == null)
+			throw new ResourceNotFoundException("Tài khoản hoăc mật khẩu không chính xác");
 		SimpleGrantedAuthority authority = new SimpleGrantedAuthority("ROLE_" + account.getRole());
-		UserDetails userDetails = User
-				.withUsername(account.getUsername())
-				.password(account.getPassword()).authorities(authority)
-				.build();
+		UserDetails userDetails = User.withUsername(account.getUsername()).password(account.getPassword())
+				.authorities(authority).build();
 		return userDetails;
 	}
 

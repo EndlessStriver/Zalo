@@ -68,10 +68,10 @@ public class JwtServiceImp implements JwtService {
 		return TokenType.REFRESH.equals(TokenType.valueOf(tokenType));
 	}
 
-	private String createToken(Map<String, Object> claims, String subject) {
+	private String createToken(Map<String, Object> claims, String subject, int hour) {
 		LocalDateTime now = LocalDateTime.now();
 		return Jwts.builder().setClaims(claims).setSubject(subject).setIssuedAt(new Date(System.currentTimeMillis()))
-				.setExpiration(Date.from(now.plusHours(3).atZone(ZoneId.systemDefault()).toInstant()))
+				.setExpiration(Date.from(now.plusHours(hour).atZone(ZoneId.systemDefault()).toInstant()))
 				.signWith(getSigningKey(), SignatureAlgorithm.HS512).compact();
 	}
 
@@ -79,7 +79,7 @@ public class JwtServiceImp implements JwtService {
 	public String generateToken(String username, TokenType tokenType) {
 		Map<String, Object> claims = new HashMap<String, Object>();
 		claims.put("type", tokenType.toString());
-		return createToken(claims, username);
+		return createToken(claims, username, tokenType.equals(TokenType.ACCESS) ? 1 : 24);
 	}
 
 	private boolean isTokenExpired(String token) {

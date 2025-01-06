@@ -73,13 +73,13 @@ public class JwtTokenFilter extends OncePerRequestFilter {
 		} catch (Exception e) {
 
 			SecurityContextHolder.clearContext();
-			response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+			response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
 			response.setContentType("application/json");
 			response.setCharacterEncoding("UTF-8");
 
 			Map<String, Object> errors = new LinkedHashMap<String, Object>();
 			errors.put("status", "error");
-			errors.put("code", HttpServletResponse.SC_FORBIDDEN);
+			errors.put("code", HttpServletResponse.SC_UNAUTHORIZED);
 			errors.put("message", e.getMessage());
 
 			response.getWriter().write(new ObjectMapper().writeValueAsString(errors));

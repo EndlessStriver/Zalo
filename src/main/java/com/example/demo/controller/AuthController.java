@@ -87,6 +87,21 @@ public class AuthController {
 				"Đăng nhập thành công", convertAccountToLoginResponse(account)));
 	}
 
+	@GetMapping("/logout")
+	public ResponseEntity<?> logout(HttpServletResponse httpServletResponse) {
+
+		Cookie cookie = new Cookie("refreshToken", null);
+		cookie.setHttpOnly(true);
+		cookie.setSecure(false); // đang không gửi qua https
+		cookie.setPath("/");
+		cookie.setMaxAge(0); // Cho thời gian sống của cookies này bằng 0
+
+		httpServletResponse.addCookie(cookie);
+
+		return ResponseEntity.status(HttpStatus.OK)
+				.body(new ResponseSuccess(HttpStatus.OK.value(), "Đăng xuất thành công"));
+	}
+
 	@PostMapping("/register")
 	public ResponseEntity<?> register(@Valid @RequestBody RegisterRequest registerRequest, BindingResult result) {
 
@@ -164,8 +179,8 @@ public class AuthController {
 	@GetMapping("/refresh-token")
 	public ResponseEntity<?> refreshToken(HttpServletRequest httpServletRequest) throws AuthenticationException {
 		String refreshToken = null;
-		
-		if(httpServletRequest.getCookies() == null)
+
+		if (httpServletRequest.getCookies() == null)
 			throw new AuthenticationException("Refresh Token không hợp lệ hoặc đã hết hạn");
 
 		for (Cookie cookie : httpServletRequest.getCookies()) {

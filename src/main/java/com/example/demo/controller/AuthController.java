@@ -115,7 +115,7 @@ public class AuthController {
 					.body(new ResponseErrorForm(HttpStatus.BAD_REQUEST.value(), "Đăng kí thất bại", errors));
 		}
 
-		return ResponseEntity.status(HttpStatus.OK).body(new ResponseDataSuccess<Account>(HttpStatus.OK.value(),
+		return ResponseEntity.status(HttpStatus.CREATED).body(new ResponseDataSuccess<Account>(HttpStatus.CREATED.value(),
 				"Đăng ký thành công", accountService.register(registerRequest)));
 	}
 

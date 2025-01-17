@@ -22,31 +22,27 @@ import com.example.demo.dto.ResponseErrorForm;
 import com.example.demo.dto.ResponseSuccess;
 import com.example.demo.entities.Account;
 import com.example.demo.entities.FriendShip;
-import com.example.demo.service.AccountService;
 import com.example.demo.service.FriendShipService;
-import com.example.demo.service.JwtService;
+import com.example.demo.unit.MethodUnit;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 
 @RestController
-@RequestMapping("/api/v1/friendship")
+@RequestMapping("/api/v1/friendships")
 public class FriendShipController {
 
-	private JwtService jwtService;
 	private FriendShipService friendShipService;
-	private AccountService accountService;
+	private MethodUnit methodUnit;
 
-	public FriendShipController(JwtService jwtService, FriendShipService friendShipService,
-			AccountService accountService) {
-		this.jwtService = jwtService;
-		this.friendShipService = friendShipService;
-		this.accountService = accountService;
+	public FriendShipController(FriendShipService friendShipService, MethodUnit methodUnit) {
+        this.friendShipService = friendShipService;
+        this.methodUnit = methodUnit;
 	}
 	
 	@GetMapping
 	public ResponseEntity<?> getFriendList(HttpServletRequest request) {
-		Account sender = getUsernameFromToken(request);
+		Account sender = methodUnit.getAccountFromToken(request);
 		List<FriendShip> friendShips = friendShipService.getFriendList(sender.getUser().getUserId());
 
 		return ResponseEntity.status(HttpStatus.OK).body(new ResponseDataSuccess<List<FriendShip>>(
@@ -67,7 +63,7 @@ public class FriendShipController {
 					HttpStatus.BAD_REQUEST.value(), "Gửi lời mời kết bạn không thành công", errors));
 		}
 
-		Account sender = getUsernameFromToken(request);
+		Account sender = methodUnit.getAccountFromToken(request);
 		FriendShip friendShip = friendShipService.sendFriendRequest(sender.getUser().getUserId(),
 				friendShipRequest.getFriendId());
 
@@ -77,7 +73,7 @@ public class FriendShipController {
 
 	@PatchMapping("/{friendShipId}")
 	public ResponseEntity<?> acceptFriendRequest(@PathVariable String friendShipId, HttpServletRequest request) {
-		Account sender = getUsernameFromToken(request);
+		Account sender = methodUnit.getAccountFromToken(request);
 		FriendShip friendShip = friendShipService.acceptFriendRequest(sender.getUser().getUserId(), friendShipId);
 
 		return ResponseEntity.status(HttpStatus.OK).body(new ResponseDataSuccess<FriendShip>(HttpStatus.OK.value(),
@@ -86,7 +82,7 @@ public class FriendShipController {
 
 	@DeleteMapping("/{friendShipId}")
 	public ResponseEntity<?> cancelFriendship(@PathVariable String friendShipId, HttpServletRequest request) {
-		Account sender = getUsernameFromToken(request);
+		Account sender = methodUnit.getAccountFromToken(request);
 		friendShipService.cancelFriendship(sender.getUser().getUserId(), friendShipId);
 
 		return ResponseEntity.status(HttpStatus.OK)
@@ -95,7 +91,7 @@ public class FriendShipController {
 
 	@GetMapping("/sent-requests")
 	public ResponseEntity<?> getFriendRequests(HttpServletRequest request) {
-		Account sender = getUsernameFromToken(request);
+		Account sender = methodUnit.getAccountFromToken(request);
 		List<FriendShip> friendShips = friendShipService.getSendedFriendRequest(sender.getUser().getUserId());
 
 		return ResponseEntity.status(HttpStatus.OK).body(new ResponseDataSuccess<List<FriendShip>>(
@@ -104,18 +100,11 @@ public class FriendShipController {
 	
 	@GetMapping("/received-requests")
 	public ResponseEntity<?> getReceivedFriendRequests(HttpServletRequest request) {
-		Account sender = getUsernameFromToken(request);
+		Account sender = methodUnit.getAccountFromToken(request);
 		List<FriendShip> friendShips = friendShipService.getReceivedFriendRequest(sender.getUser().getUserId());
 
 		return ResponseEntity.status(HttpStatus.OK).body(new ResponseDataSuccess<List<FriendShip>>(
 				HttpStatus.OK.value(), "Lấy danh sách được yêu cầu kết bạn thành công", friendShips));
-	}
-
-	private Account getUsernameFromToken(HttpServletRequest request) {
-		String authorizationHeader = request.getHeader("Authorization");
-		String jwt = authorizationHeader.substring(7);
-		String usernameSender = jwtService.extractUsername(jwt);
-		return accountService.getAccountByUsername(usernameSender);
 	}
 
 }

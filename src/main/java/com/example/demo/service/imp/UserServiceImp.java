@@ -22,4 +22,9 @@ public class UserServiceImp implements UserService {
 		return userRepository.findFriendsByFullnameAndUserId(userId, friendName);
 	}
 
+	@Override
+	public User findByPhoneNumber(String phoneNumber) {
+		return userRepository.findByPhoneNumber(phoneNumber);
+	}
+
 }

@@ -12,9 +12,7 @@ import com.example.demo.entities.ChatRoom;
 @Repository
 public interface ChatRoomRepository extends JpaRepository<ChatRoom, String> {
 	
-	@Query("select c from ChatRoom c "
-			+ "where c.roomName like lower(concat('%', :roomName, '%')) "
-			+ "and exists (select 1 from c.userChatRooms ucr where ucr.user.userId = :userId)")
+	@Query("select cr from ChatRoom cr join cr.userChatRooms ucr where ucr.user.userId = :userId and cr.roomName = :roomName")
 	List<ChatRoom> findRoomsByNameAndUserId(@Param("userId") String userId, @Param("roomName") String roomName);
 	
 }

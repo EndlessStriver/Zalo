@@ -29,12 +29,19 @@ public class UserController {
 		this.methodUnit = methodUnit;
 	}
 
-	@GetMapping
-	public ResponseEntity<?> getUser(@RequestParam String friendName, HttpServletRequest request) {
+	@GetMapping("/friends")
+	public ResponseEntity<?> getFriendsAndMessageContacts(@RequestParam String friendName, HttpServletRequest request) {
 		Account sender = methodUnit.getAccountFromToken(request);
 		List<User> users = userService.getFriendsAndMessageContacts(sender.getUser().getUserId(), friendName);
 		return ResponseEntity.status(HttpStatus.OK).body(new ResponseDataSuccess<List<User>>(HttpStatus.OK.value(),
 				"Lấy danh sách người dùng đã tương tác thành công", users));
+	}
+	
+	@GetMapping("/phone")
+	public ResponseEntity<?> getUser(@RequestParam String phoneNumber) {
+		User users = userService.findByPhoneNumber(phoneNumber);
+		return ResponseEntity.status(HttpStatus.OK).body(
+				new ResponseDataSuccess<User>(HttpStatus.OK.value(), "Tìm bạn bè thành công", users));
 	}
 
 }

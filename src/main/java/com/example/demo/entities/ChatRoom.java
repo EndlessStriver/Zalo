@@ -4,6 +4,8 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.DiscriminatorColumn;
@@ -33,10 +35,8 @@ public abstract class ChatRoom {
 	@Column(name = "chat_room_id")
 	private String chatRoomId;
 	
-	@Column(name = "is_group")
-	private Boolean group;
-	
 	@OneToMany(mappedBy = "chatRoom", cascade = CascadeType.ALL)
+	@JsonIgnore
 	private List<UserChatRoom> userChatRooms = new ArrayList<UserChatRoom>();
 	
 	@Column(name = "created_at")

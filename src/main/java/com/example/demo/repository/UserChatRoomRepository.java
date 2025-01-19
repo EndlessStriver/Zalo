@@ -7,5 +7,5 @@ import com.example.demo.entities.UserChatRoom;
 
 @Repository
 public interface UserChatRoomRepository extends JpaRepository<UserChatRoom, String> {
-
+	
 }

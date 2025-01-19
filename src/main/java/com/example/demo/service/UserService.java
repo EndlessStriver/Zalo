@@ -6,6 +6,8 @@ import com.example.demo.entities.User;
 
 public interface UserService {
 
-	List<User> getFriendsAndMessageContacts (String userId, String friendName);
-	
+	List<User> getFriendsAndMessageContacts(String userId, String friendName);
+
+	User findByPhoneNumber(String phoneNumber);
+
 }

@@ -86,12 +86,12 @@ public class FriendShipServiceImp implements FriendShipService {
 
 	@Override
 	public List<FriendShip> getSendedFriendRequest(String senderId) {
-		return friendShipRepository.findByUserIdAndStatusSend(senderId, FriendShipStatus.PENDING);
+		return friendShipRepository.findByUserIdSendFriendRequest(senderId);
 	}
 
 	@Override
 	public List<FriendShip> getReceivedFriendRequest(String receiverId) {
-		return friendShipRepository.findByUserIdAndStatusReceive(receiverId, FriendShipStatus.PENDING);
+		return friendShipRepository.findByUserIdReceiveFriendRequest(receiverId);
 	}
 
 	@Override

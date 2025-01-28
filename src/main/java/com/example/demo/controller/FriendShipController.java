@@ -45,6 +45,8 @@ public class FriendShipController {
 	public ResponseEntity<?> getFriendList(HttpServletRequest request) {
 		Account sender = methodUnit.getAccountFromToken(request);
 		List<FriendShip> friendShips = friendShipService.getFriendList(sender.getUser().getUserId());
+		
+		friendShips.forEach(fs -> System.out.println(fs));
 
 		return ResponseEntity.status(HttpStatus.OK).body(new ResponseDataSuccess<List<FriendShip>>(
 				HttpStatus.OK.value(), "Lấy danh sách bạn bè thành công", friendShips));

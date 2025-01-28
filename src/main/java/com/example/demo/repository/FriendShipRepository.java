@@ -16,18 +16,16 @@ import io.lettuce.core.dynamic.annotation.Param;
 @Repository
 public interface FriendShipRepository extends JpaRepository<FriendShip, String> {
 
-	@Query("select count(fs) > 0 from FriendShip fs join fs.user u join fs.friend f where u.userId = :senderId and f.userId = :friendId")
+	@Query("select count(fs) > 0 from FriendShip fs join fs.user u join fs.friend f where (u.userId = :senderId and f.userId = :friendId) or (u.userId = :friendId and f.userId = :senderId)")
 	boolean existsByUserAndFriend(@Param("senderId") String senderId, @Param("friendId") String friendId);
 
-	@Query("select fs from FriendShip fs join fs.user u where u.userId = :userId and fs.status = :status")
-	List<FriendShip> findByUserIdAndStatusSend(@Param("userId") String userId,
-			@Param("status") FriendShipStatus status);
+	@Query("select fo from User u join u.friendShips fo where u.userId = :userId")
+	List<FriendShip> findByUserIdSendFriendRequest(@Param("userId") String userId);
 
-	@Query("select fs from FriendShip fs join fs.friend f where f.userId = :userId and fs.status = :status")
-	List<FriendShip> findByUserIdAndStatusReceive(@Param("userId") String userId,
-			@Param("status") FriendShipStatus status);
+	@Query("select fo from User u join u.friendOf fo where u.userId = :userId")
+	List<FriendShip> findByUserIdReceiveFriendRequest(@Param("userId") String userId);
 
-	@Query("select fs from FriendShip fs join fs.user u join fs.friend f where u.userId = :userId or f.userId = :userId and fs.status = :status")
+	@Query("select fs from FriendShip fs join fs.user u join fs.friend f where (u.userId = :userId or f.userId = :userId) and fs.status = :status")
 	List<FriendShip> findByUserIdAndStatus(@Param("userId") String userId, @Param("status") FriendShipStatus status);
 
 	@Query(value = "select " + "case " + "when u.user_id = :senderId then 'IS_YOU' "
@@ -40,8 +38,8 @@ public interface FriendShipRepository extends JpaRepository<FriendShip, String> 
 	FriendType checkFriendTypeByPhoneNumberAndSenderId(@Param("phoneNumber") String phoneNumber,
 			@Param("senderId") String senderId);
 
-	@Query("select fs " + "from FriendShip fs " + "join fs.user u join fs.friend f " + "where u.userId = :senderId "
-			+ "and f.userId = :friendId " + "or u.userId = :friendId " + "and f.userId = :senderId")
+	@Query("select fs " + "from FriendShip fs " + "join fs.user u join fs.friend f " + "where (u.userId = :senderId "
+			+ "and f.userId = :friendId) " + "or (u.userId = :friendId " + "and f.userId = :senderId)")
 	Optional<FriendShip> findBySenderAndFriend(@Param("senderId") String senderId, @Param("friendId") String friendId);
 
 }

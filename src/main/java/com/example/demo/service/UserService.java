@@ -8,6 +8,6 @@ public interface UserService {
 
 	List<User> getFriendsAndMessageContacts(String userId, String friendName);
 
-	User findByPhoneNumber(String phoneNumber);
+	User findByPhoneNumber(String phoneNumber, String userId);
 
 }

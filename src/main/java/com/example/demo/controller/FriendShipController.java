@@ -10,10 +10,10 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.example.demo.dto.FriendShipRequest;
@@ -22,6 +22,7 @@ import com.example.demo.dto.ResponseErrorForm;
 import com.example.demo.dto.ResponseSuccess;
 import com.example.demo.entities.Account;
 import com.example.demo.entities.FriendShip;
+import com.example.demo.entities.enums.FriendType;
 import com.example.demo.service.FriendShipService;
 import com.example.demo.unit.MethodUnit;
 
@@ -48,6 +49,16 @@ public class FriendShipController {
 		return ResponseEntity.status(HttpStatus.OK).body(new ResponseDataSuccess<List<FriendShip>>(
 				HttpStatus.OK.value(), "Lấy danh sách bạn bè thành công", friendShips));
 	}
+	
+	@GetMapping("/check-friendship")
+	public ResponseEntity<?> checkFriendshipByPhoneNumber(@RequestParam String phoneNumber,
+			HttpServletRequest request) {
+		Account sender = methodUnit.getAccountFromToken(request);
+		FriendType friendType = friendShipService.checkFriendshipByPhoneNumber(phoneNumber ,sender.getUser().getUserId());
+
+		return ResponseEntity.status(HttpStatus.OK).body(new ResponseDataSuccess<FriendType>(HttpStatus.OK.value(),
+				"Kiểm tra quan hệ bạn bè thành công", friendType));
+	}
 
 	@PostMapping
 	public ResponseEntity<?> sendFriendRequest(@Valid @RequestBody FriendShipRequest friendShipRequest,
@@ -71,19 +82,19 @@ public class FriendShipController {
 				HttpStatus.CREATED.value(), "Gửi lời mời kết bạn thành công", friendShip));
 	}
 
-	@PatchMapping("/{friendShipId}")
-	public ResponseEntity<?> acceptFriendRequest(@PathVariable String friendShipId, HttpServletRequest request) {
+	@PatchMapping
+	public ResponseEntity<?> acceptFriendRequest(@RequestParam String friendId, HttpServletRequest request) {
 		Account sender = methodUnit.getAccountFromToken(request);
-		FriendShip friendShip = friendShipService.acceptFriendRequest(sender.getUser().getUserId(), friendShipId);
+		FriendShip friendShip = friendShipService.acceptFriendRequest(sender.getUser().getUserId(), friendId);
 
 		return ResponseEntity.status(HttpStatus.OK).body(new ResponseDataSuccess<FriendShip>(HttpStatus.OK.value(),
 				"Chấp nhận lời mời kết bạn thành công", friendShip));
 	}
 
-	@DeleteMapping("/{friendShipId}")
-	public ResponseEntity<?> cancelFriendship(@PathVariable String friendShipId, HttpServletRequest request) {
+	@DeleteMapping
+	public ResponseEntity<?> cancelFriendship(@RequestParam String friendId, HttpServletRequest request) {
 		Account sender = methodUnit.getAccountFromToken(request);
-		friendShipService.cancelFriendship(sender.getUser().getUserId(), friendShipId);
+		friendShipService.cancelFriendship(sender.getUser().getUserId(), friendId);
 
 		return ResponseEntity.status(HttpStatus.OK)
 				.body(new ResponseSuccess(HttpStatus.OK.value(), "Hủy kết bạn thành công"));

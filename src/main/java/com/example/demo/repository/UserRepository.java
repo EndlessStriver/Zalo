@@ -26,8 +26,8 @@ public interface UserRepository extends JpaRepository<User, String> {
 			+ "AND LOWER(CONCAT(u.first_name, ' ', u.last_name)) "
 			+ "LIKE LOWER(CONCAT('%', :friendName, '%'))", nativeQuery = true)
 	List<User> findFriendsByFullnameAndUserId(@Param("userId") String userId, @Param("friendName") String friendName);
-	
-	@Query("select u from User u where u.phoneNumber = :phoneNumber")
+
+	@Query("SELECT u FROM User u WHERE u.phoneNumber = :phoneNumber")
 	User findByPhoneNumber(@Param("phoneNumber") String phoneNumber);
 
 }

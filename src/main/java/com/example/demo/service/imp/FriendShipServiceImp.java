@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 import com.example.demo.entities.FriendShip;
 import com.example.demo.entities.User;
 import com.example.demo.entities.enums.FriendShipStatus;
+import com.example.demo.entities.enums.FriendType;
 import com.example.demo.exception.AuthorizationException;
 import com.example.demo.exception.BadRequestException;
 import com.example.demo.exception.ResourceNotFoundException;
@@ -32,9 +33,9 @@ public class FriendShipServiceImp implements FriendShipService {
 
 		User friend = userRepository.findById(friendId).orElseThrow(() -> new ResourceNotFoundException(
 				"Không tìm thấy người nhận lời mời kết bạn với id là: " + friendId));
-		
-		if(sender.getUserId().equals(friend.getUserId()))
-            throw new BadRequestException("Bạn không thể gửi yêu cầu kết bạn cho chính mình");
+
+		if (sender.getUserId().equals(friend.getUserId()))
+			throw new BadRequestException("Bạn không thể gửi yêu cầu kết bạn cho chính mình");
 
 		boolean checkFriendShipIsExists = friendShipRepository.existsByUserAndFriend(senderId, friendId);
 
@@ -49,13 +50,17 @@ public class FriendShipServiceImp implements FriendShipService {
 	}
 
 	@Override
-	public FriendShip acceptFriendRequest(String senderId, String friendShipId) {
-		FriendShip friendShip = friendShipRepository.findById(friendShipId).orElseThrow(
-				() -> new ResourceNotFoundException("Không tìm thấy yêu cầu kết bạn với id là: " + friendShipId));
+	public FriendShip acceptFriendRequest(String senderId, String friendId) {
 
-		if (!friendShip.getUser().getUserId().equals(senderId))
+		if (senderId.equals(friendId))
+			throw new BadRequestException("FriendId không được trùng với SenderId");
+
+		FriendShip friendShip = friendShipRepository.findBySenderAndFriend(senderId, friendId)
+				.orElseThrow(() -> new ResourceNotFoundException("Không tìm thấy yêu cầu kết bạn với người dùng này"));
+
+		if (!friendShip.getFriend().getUserId().equals(senderId))
 			throw new AuthorizationException("Bạn không thể chấp nhận yêu cầu kết bạn của người khác");
-		
+
 		if (friendShip.getStatus() != FriendShipStatus.PENDING)
 			throw new BadRequestException("Yêu cầu kết bạn này đã được xử lý");
 
@@ -65,9 +70,13 @@ public class FriendShipServiceImp implements FriendShipService {
 	}
 
 	@Override
-	public void cancelFriendship(String senderId, String friendShipId) {
-		FriendShip friendShip = friendShipRepository.findById(friendShipId).orElseThrow(
-				() -> new ResourceNotFoundException("Không tìm thấy yêu cầu kết bạn với id là: " + friendShipId));
+	public void cancelFriendship(String senderId, String friendId) {
+
+		if (senderId.equals(friendId))
+			throw new BadRequestException("FriendId không được trùng với SenderId");
+
+		FriendShip friendShip = friendShipRepository.findBySenderAndFriend(senderId, friendId)
+				.orElseThrow(() -> new ResourceNotFoundException("Không tìm thấy yêu cầu kết bạn với người dùng này"));
 
 		if (friendShip.getUser().getUserId().equals(senderId) || friendShip.getFriend().getUserId().equals(senderId))
 			friendShipRepository.delete(friendShip);
@@ -88,6 +97,11 @@ public class FriendShipServiceImp implements FriendShipService {
 	@Override
 	public List<FriendShip> getFriendList(String userId) {
 		return friendShipRepository.findByUserIdAndStatus(userId, FriendShipStatus.ACCEPTED);
+	}
+
+	@Override
+	public FriendType checkFriendshipByPhoneNumber(String phoneNumber, String senderId) {
+		return friendShipRepository.checkFriendTypeByPhoneNumberAndSenderId(phoneNumber, senderId);
 	}
 
 }

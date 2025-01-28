@@ -38,8 +38,9 @@ public class UserController {
 	}
 	
 	@GetMapping("/phone")
-	public ResponseEntity<?> getUser(@RequestParam String phoneNumber) {
-		User users = userService.findByPhoneNumber(phoneNumber);
+	public ResponseEntity<?> getUser(@RequestParam String phoneNumber, HttpServletRequest request) {
+		Account sender = methodUnit.getAccountFromToken(request);
+		User users = userService.findByPhoneNumber(phoneNumber, sender.getUser().getUserId());
 		return ResponseEntity.status(HttpStatus.OK).body(
 				new ResponseDataSuccess<User>(HttpStatus.OK.value(), "Tìm bạn bè thành công", users));
 	}

@@ -23,7 +23,7 @@ public class UserServiceImp implements UserService {
 	}
 
 	@Override
-	public User findByPhoneNumber(String phoneNumber) {
+	public User findByPhoneNumber(String phoneNumber, String userId) {
 		return userRepository.findByPhoneNumber(phoneNumber);
 	}
 

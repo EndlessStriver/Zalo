@@ -97,4 +97,19 @@ public class User {
 	public void preUpdate() {
 		this.updatedAt = LocalDateTime.now();
 	}
+
+	public User(String userId, String firstName, String lastName, Gender gender, LocalDate birthday, String phoneNumber,
+			String email, String bio, String avatarUrl, LocalDateTime createdAt, LocalDateTime updatedAt) {
+		this.userId = userId;
+		this.firstName = firstName;
+		this.lastName = lastName;
+		this.gender = gender;
+		this.birthday = birthday;
+		this.phoneNumber = phoneNumber;
+		this.email = email;
+		this.bio = bio;
+		this.avatarUrl = avatarUrl;
+		this.createdAt = createdAt;
+		this.updatedAt = updatedAt;
+	}
 }

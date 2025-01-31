@@ -1,4 +1,4 @@
-package com.example.demo.config;
+package com.example.demo.filter;
 
 import java.io.IOException;
 import java.util.LinkedHashMap;
@@ -12,6 +12,7 @@ import org.springframework.util.AntPathMatcher;
 import org.springframework.util.PathMatcher;
 import org.springframework.web.filter.OncePerRequestFilter;
 
+import com.example.demo.config.EndPoint;
 import com.example.demo.exception.AuthorizationException;
 import com.example.demo.service.JwtService;
 import com.example.demo.service.MyUserDetailService;
@@ -43,7 +44,6 @@ public class JwtTokenFilter extends OncePerRequestFilter {
 			String username = null;
 			String jwt = null;
 			String authorizationHeader = request.getHeader("Authorization");
-			
 
 			if (shouldBypassFilter(requestURI, requestMethod)) {
 				filterChain.doFilter(request, response);
@@ -89,23 +89,25 @@ public class JwtTokenFilter extends OncePerRequestFilter {
 	}
 
 	private boolean shouldBypassFilter(String requestURI, String requestMethod) {
-
+		
 		PathMatcher pathMatcher = new AntPathMatcher();
+
+		for (String endpoint : EndPoint.ALLOWED_PATHS) {
+			if (pathMatcher.match(endpoint, requestURI)) return true;
+		}
 
 		if (requestMethod.equals("POST")) {
 			for (String endpoint : EndPoint.PUBLIC_METHODS_POST) {
-				if (pathMatcher.match(endpoint, requestURI) && requestMethod.equals("POST"))
-					return true;
+				if (pathMatcher.match(endpoint, requestURI) && requestMethod.equals("POST")) return true;
 			}
 		}
 
 		if (requestMethod.equals("GET")) {
 			for (String endpoint : EndPoint.PUBLIC_METHODS_GET) {
-				if (pathMatcher.match(endpoint, requestURI) && requestMethod.equals("GET"))
-					return true;
+				if (pathMatcher.match(endpoint, requestURI) && requestMethod.equals("GET")) return true;
 			}
 		}
-		
+
 		return false;
 	}
 

@@ -8,20 +8,20 @@ import com.example.demo.entities.Account;
 
 public interface AccountService {
 
-	Account getAccountById(String accountId);
+	Account findById(String accountId);
 	
-	Account getAccountByUsername(String username);
+	Account findByUsername(String username);
 	
-	Account getAccountByEmail(String email);
+	Account findByEmail(String email);
 
-	List<Account> getAllAccount();
+	List<Account> findAll();
 	
 	Account login(LoginRequest loginRequest);
 	
 	Account register(RegisterRequest registerRequest);
 	
-	boolean checkAccountIsVerify(boolean verify, String email);
+	boolean isAccountVerifiedByEmail(boolean verify, String email);
 	
-	void verifyAccountWithEmail(String email);
+	void verifyByEmail(String email);
 
 }

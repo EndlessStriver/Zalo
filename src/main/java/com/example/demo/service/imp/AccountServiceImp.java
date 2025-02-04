@@ -38,17 +38,17 @@ public class AccountServiceImp implements AccountService {
 	}
 
 	@Override
-	public Account getAccountById(String accountId) {
+	public Account findById(String accountId) {
 		return accountRepository.findById(accountId).orElse(null);
 	}
 
 	@Override
-	public Account getAccountByUsername(String username) {
-		return accountRepository.getAccountByUsername(username).orElse(null);
+	public Account findByUsername(String username) {
+		return accountRepository.findByUsername(username).orElse(null);
 	}
 
 	@Override
-	public List<Account> getAllAccount() {
+	public List<Account> findAll() {
 		return accountRepository.findAll();
 	}
 
@@ -57,7 +57,7 @@ public class AccountServiceImp implements AccountService {
 		Authentication authentication = authenticationManager
 				.authenticate(new UsernamePasswordAuthenticationToken(loginRequest.getUsername(), loginRequest.getPassword()));
 		if (authentication.isAuthenticated()) {
-			Account account = accountRepository.getAccountByUsername(loginRequest.getUsername()).orElse(null);
+			Account account = accountRepository.findByUsername(loginRequest.getUsername()).orElse(null);
 			if(account == null) throw new ResourceNotFoundException("Không tìm thấy tài khoản với tên đăng nhập là: " + loginRequest.getUsername());
 			return account;
 		} else {
@@ -91,18 +91,18 @@ public class AccountServiceImp implements AccountService {
 	}
 
 	@Override
-	public boolean checkAccountIsVerify(boolean verify, String email) {
-		return accountRepository.checkAccountIsVerify(verify, email);
+	public boolean isAccountVerifiedByEmail(boolean verify, String email) {
+		return accountRepository.isAccountVerifiedByEmail(verify, email);
 	}
 
 	@Override
-	public Account getAccountByEmail(String email) {
-		return accountRepository.getAccountByEmail(email).orElse(null);
+	public Account findByEmail(String email) {
+		return accountRepository.findByEmail(email).orElse(null);
 	}
 
 	@Override
-	public void verifyAccountWithEmail(String email) {
-		Account account = accountRepository.getAccountByEmail(email).orElse(null);
+	public void verifyByEmail(String email) {
+		Account account = accountRepository.findByEmail(email).orElse(null);
 		if(account == null) throw new ResourceNotFoundException("Không tìm thấy tài khoản liên kết với email: " + email);
 		account.setVerified(true);
 		accountRepository.save(account);

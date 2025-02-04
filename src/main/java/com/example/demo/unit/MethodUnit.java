@@ -24,6 +24,6 @@ public class MethodUnit {
 		String authorizationHeader = request.getHeader("Authorization");
 		String jwt = authorizationHeader.substring(7);
 		String usernameSender = jwtService.extractUsername(jwt);
-		return accountService.getAccountByUsername(usernameSender);
+		return accountService.findByUsername(usernameSender);
 	}
 }

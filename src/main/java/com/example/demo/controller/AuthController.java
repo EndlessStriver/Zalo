@@ -153,7 +153,7 @@ public class AuthController {
 					.body(new ResponseErrorForm(HttpStatus.BAD_REQUEST.value(), "Xác thực tài khoản thất bại", errors));
 		}
 
-		if (accountService.checkAccountIsVerify(true, otpRequest.getEmail())) {
+		if (accountService.isAccountVerifiedByEmail(true, otpRequest.getEmail())) {
 			return ResponseEntity.status(HttpStatus.BAD_REQUEST)
 					.body(new ResponseError(HttpStatus.BAD_REQUEST.value(), "Tài khoản đã được xác thực"));
 		}
@@ -170,7 +170,7 @@ public class AuthController {
 					.body(new ResponseError(HttpStatus.BAD_REQUEST.value(), "Mã OTP không đúng hoặc đã hết hạn"));
 		}
 
-		accountService.verifyAccountWithEmail(otpRequest.getEmail());
+		accountService.verifyByEmail(otpRequest.getEmail());
 		redisService.delete(String.format("otp?email=%s", otpRequest.getEmail()));
 		return ResponseEntity.status(HttpStatus.OK)
 				.body(new ResponseSuccess(HttpStatus.OK.value(), "Xác thực tài khoản thành công"));

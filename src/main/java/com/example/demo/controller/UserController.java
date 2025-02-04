@@ -29,7 +29,7 @@ public class UserController {
 		this.methodUnit = methodUnit;
 	}
 
-	@GetMapping("/friends")
+	@GetMapping("/contacts")
 	public ResponseEntity<?> getFriendsAndMessageContacts(@RequestParam String friendName, HttpServletRequest request) {
 		Account sender = methodUnit.getAccountFromToken(request);
 		List<User> users = userService.getFriendsAndMessageContacts(sender.getUser().getUserId(), friendName);
@@ -37,12 +37,12 @@ public class UserController {
 				"Lấy danh sách người dùng đã tương tác thành công", users));
 	}
 	
-	@GetMapping("/phone")
-	public ResponseEntity<?> getUser(@RequestParam String phoneNumber, HttpServletRequest request) {
+	@GetMapping("/search-by-phone")
+	public ResponseEntity<?> getUserByPhoneNumber(@RequestParam String phoneNumber, HttpServletRequest request) {
 		Account sender = methodUnit.getAccountFromToken(request);
-		User users = userService.findByPhoneNumber(phoneNumber, sender.getUser().getUserId());
+		User user = userService.findByPhoneNumber(phoneNumber, sender.getUser().getUserId());
 		return ResponseEntity.status(HttpStatus.OK).body(
-				new ResponseDataSuccess<User>(HttpStatus.OK.value(), "Tìm bạn bè thành công", users));
+				new ResponseDataSuccess<User>(HttpStatus.OK.value(), "Tìm bạn bè thành công", user));
 	}
-
 }
+

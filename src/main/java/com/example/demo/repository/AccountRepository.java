@@ -11,14 +11,31 @@ import com.example.demo.entities.Account;
 
 @Repository
 public interface AccountRepository extends JpaRepository<Account, String> {
-	
-	@Query("select ac from Account ac where ac.username = :username")
-	Optional<Account> getAccountByUsername(@Param("username") String username);
-	
-	@Query("select case when count(ac) > 0 then true else false end from Account ac join ac.user u where ac.verified = :verify and u.email = :email")
-	boolean checkAccountIsVerify(@Param("verify") boolean verify, @Param("email") String email);
-	
-	@Query("select ac from Account ac join ac.user u where u.email = :email")
-	Optional<Account> getAccountByEmail(@Param("email") String email);
-	
+
+	@Query("""
+				SELECT ac FROM Account ac
+				WHERE ac.username = :username
+			""")
+	Optional<Account> findByUsername(@Param("username") String username);
+
+	@Query("""
+				SELECT CASE WHEN count(ac) > 0
+					THEN true
+					ELSE false
+				END
+				FROM Account ac
+				JOIN ac.user u
+				WHERE ac.verified = :verify
+				AND u.email = :email
+			""")
+	boolean isAccountVerifiedByEmail(@Param("verify") boolean verify, @Param("email") String email);
+
+	@Query("""
+				SELECT ac
+				FROM Account ac
+				JOIN ac.user u
+				WHERE u.email = :email
+			""")
+	Optional<Account> findByEmail(@Param("email") String email);
+
 }

@@ -9,5 +9,7 @@ public interface UserService {
 	List<User> getFriendsAndMessageContacts(String userId, String friendName);
 
 	User findByPhoneNumber(String phoneNumber, String userId);
+	
+	User findById(String userId);
 
 }

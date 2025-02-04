@@ -6,6 +6,8 @@ import com.example.demo.entities.ChatRoom;
 
 public interface ChatRoomService {
 	
-	List<ChatRoom> getMyChatrooms (String userId, String roomName);
+	List<ChatRoom> findMyChatRoomsByRoomName (String myId, String roomName);
+	
+	ChatRoom findById (String chatRoomId);
 	
 }

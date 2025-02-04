@@ -26,70 +26,68 @@ import jakarta.servlet.http.HttpServletRequest;
 @RequestMapping("/api/v1/friendships")
 public class FriendShipController {
 
-	private FriendShipService friendShipService;
-	private MethodUnit methodUnit;
+    private FriendShipService friendShipService;
+    private MethodUnit methodUnit;
 
-	public FriendShipController(FriendShipService friendShipService, MethodUnit methodUnit) {
-		this.friendShipService = friendShipService;
-		this.methodUnit = methodUnit;
-	}
+    public FriendShipController(FriendShipService friendShipService, MethodUnit methodUnit) {
+        this.friendShipService = friendShipService;
+        this.methodUnit = methodUnit;
+    }
 
-	@GetMapping
-	public ResponseEntity<?> getFriendList(HttpServletRequest request) {
-		Account sender = methodUnit.getAccountFromToken(request);
-		List<FriendShip> friendShips = friendShipService.getFriendList(sender.getUser().getUserId());
-		return ResponseEntity.status(HttpStatus.OK).body(new ResponseDataSuccess<List<FriendShip>>(
-				HttpStatus.OK.value(), "Lấy danh sách bạn bè thành công", friendShips));
-	}
+    @GetMapping("/list")
+    public ResponseEntity<?> getFriendList(HttpServletRequest request) {
+        Account sender = methodUnit.getAccountFromToken(request);
+        List<FriendShip> friendShips = friendShipService.getFriendList(sender.getUser().getUserId());
+        return ResponseEntity.status(HttpStatus.OK).body(new ResponseDataSuccess<>(
+                HttpStatus.OK.value(), "Lấy danh sách bạn bè thành công", friendShips));
+    }
 
-	@GetMapping("/check-friendship")
-	public ResponseEntity<?> checkFriendshipByPhoneNumber(@RequestParam String phoneNumber,
-			HttpServletRequest request) {
-		Account sender = methodUnit.getAccountFromToken(request);
-		FriendType friendType = friendShipService.checkFriendshipByPhoneNumber(phoneNumber,
-				sender.getUser().getUserId());
-		return ResponseEntity.status(HttpStatus.OK).body(new ResponseDataSuccess<FriendType>(HttpStatus.OK.value(),
-				"Kiểm tra quan hệ bạn bè thành công", friendType));
-	}
+    @GetMapping("/check")
+    public ResponseEntity<?> checkFriendshipByPhoneNumber(@RequestParam String phoneNumber, HttpServletRequest request) {
+        Account sender = methodUnit.getAccountFromToken(request);
+        FriendType friendType = friendShipService.checkFriendshipByPhoneNumber(phoneNumber, sender.getUser().getUserId());
+        return ResponseEntity.status(HttpStatus.OK).body(new ResponseDataSuccess<>(
+                HttpStatus.OK.value(), "Kiểm tra quan hệ bạn bè thành công", friendType));
+    }
 
-	@PostMapping
-	public ResponseEntity<?> sendFriendRequest(@RequestParam String friendId, HttpServletRequest request) {
-		Account sender = methodUnit.getAccountFromToken(request);
-		FriendShip friendShip = friendShipService.sendFriendRequest(sender.getUser().getUserId(), friendId);
-		return ResponseEntity.status(HttpStatus.CREATED).body(new ResponseDataSuccess<FriendShip>(
-				HttpStatus.CREATED.value(), "Gửi lời mời kết bạn thành công", friendShip));
-	}
+    @PostMapping("/request")
+    public ResponseEntity<?> sendFriendRequest(@RequestParam String friendId, HttpServletRequest request) {
+        Account sender = methodUnit.getAccountFromToken(request);
+        FriendShip friendShip = friendShipService.sendFriendRequest(sender.getUser().getUserId(), friendId);
+        return ResponseEntity.status(HttpStatus.CREATED).body(new ResponseDataSuccess<>(
+                HttpStatus.CREATED.value(), "Gửi lời mời kết bạn thành công", friendShip));
+    }
 
-	@PatchMapping
-	public ResponseEntity<?> acceptFriendRequest(@RequestParam String friendId, HttpServletRequest request) {
-		Account sender = methodUnit.getAccountFromToken(request);
-		FriendShip friendShip = friendShipService.acceptFriendRequest(sender.getUser().getUserId(), friendId);
-		return ResponseEntity.status(HttpStatus.OK).body(new ResponseDataSuccess<FriendShip>(HttpStatus.OK.value(),
-				"Chấp nhận lời mời kết bạn thành công", friendShip));
-	}
+    @PatchMapping("/accept")
+    public ResponseEntity<?> acceptFriendRequest(@RequestParam String friendId, HttpServletRequest request) {
+        Account sender = methodUnit.getAccountFromToken(request);
+        FriendShip friendShip = friendShipService.acceptFriendRequest(sender.getUser().getUserId(), friendId);
+        return ResponseEntity.status(HttpStatus.OK).body(new ResponseDataSuccess<>(
+                HttpStatus.OK.value(), "Chấp nhận lời mời kết bạn thành công", friendShip));
+    }
 
-	@DeleteMapping
-	public ResponseEntity<?> cancelFriendship(@RequestParam String friendId, HttpServletRequest request) {
-		Account sender = methodUnit.getAccountFromToken(request);
-		friendShipService.cancelFriendship(sender.getUser().getUserId(), friendId);
-		return ResponseEntity.status(HttpStatus.OK)
-				.body(new ResponseSuccess(HttpStatus.OK.value(), "Hủy kết bạn thành công"));
-	}
+    @DeleteMapping("/remove")
+    public ResponseEntity<?> cancelFriendship(@RequestParam String friendId, HttpServletRequest request) {
+        Account sender = methodUnit.getAccountFromToken(request);
+        friendShipService.cancelFriendship(sender.getUser().getUserId(), friendId);
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(new ResponseSuccess(HttpStatus.OK.value(), "Hủy kết bạn thành công"));
+    }
 
-	@GetMapping("/sent-requests")
-	public ResponseEntity<?> getFriendRequests(HttpServletRequest request) {
-		Account sender = methodUnit.getAccountFromToken(request);
-		List<FriendShip> friendShips = friendShipService.getSendedFriendRequest(sender.getUser().getUserId());
-		return ResponseEntity.status(HttpStatus.OK).body(new ResponseDataSuccess<List<FriendShip>>(
-				HttpStatus.OK.value(), "Lấy danh sách đã mời kết bạn thành công", friendShips));
-	}
+    @GetMapping("/requests/sent")
+    public ResponseEntity<?> getSentFriendRequests(HttpServletRequest request) {
+        Account sender = methodUnit.getAccountFromToken(request);
+        List<FriendShip> friendShips = friendShipService.getSendedFriendRequest(sender.getUser().getUserId());
+        return ResponseEntity.status(HttpStatus.OK).body(new ResponseDataSuccess<>(
+                HttpStatus.OK.value(), "Lấy danh sách đã mời kết bạn thành công", friendShips));
+    }
 
-	@GetMapping("/received-requests")
-	public ResponseEntity<?> getReceivedFriendRequests(HttpServletRequest request) {
-		Account sender = methodUnit.getAccountFromToken(request);
-		List<FriendShip> friendShips = friendShipService.getReceivedFriendRequest(sender.getUser().getUserId());
-		return ResponseEntity.status(HttpStatus.OK).body(new ResponseDataSuccess<List<FriendShip>>(
-				HttpStatus.OK.value(), "Lấy danh sách được yêu cầu kết bạn thành công", friendShips));
-	}
-
+    @GetMapping("/requests/received")
+    public ResponseEntity<?> getReceivedFriendRequests(HttpServletRequest request) {
+        Account sender = methodUnit.getAccountFromToken(request);
+        List<FriendShip> friendShips = friendShipService.getReceivedFriendRequest(sender.getUser().getUserId());
+        return ResponseEntity.status(HttpStatus.OK).body(new ResponseDataSuccess<>(
+                HttpStatus.OK.value(), "Lấy danh sách được yêu cầu kết bạn thành công", friendShips));
+    }
 }
+

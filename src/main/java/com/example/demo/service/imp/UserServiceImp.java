@@ -27,4 +27,9 @@ public class UserServiceImp implements UserService {
 		return userRepository.findByPhoneNumber(phoneNumber);
 	}
 
+	@Override
+	public User findById(String userId) {
+		return userRepository.findById(userId).orElse(null);
+	}
+
 }

@@ -67,7 +67,6 @@ public class JwtTokenFilter extends OncePerRequestFilter {
 					throw new AuthorizationException("Token không hợp lệ hoặc đã hết hạn");
 				}
 			}
-
 			filterChain.doFilter(request, response);
 
 		} catch (Exception e) {

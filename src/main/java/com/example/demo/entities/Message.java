@@ -1,6 +1,7 @@
 package com.example.demo.entities;
 
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.DiscriminatorColumn;
@@ -11,6 +12,7 @@ import jakarta.persistence.Inheritance;
 import jakarta.persistence.InheritanceType;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.PrePersist;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -41,4 +43,10 @@ public abstract class Message {
 	
 	@Column(name = "timestamp")
 	private LocalDateTime timestamp;
+	
+	@PrePersist
+	public void prePersist() {
+		this.messageId = UUID.randomUUID().toString();
+		this.timestamp = LocalDateTime.now();
+	}
 }

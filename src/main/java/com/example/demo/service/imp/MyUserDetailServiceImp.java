@@ -23,7 +23,7 @@ public class MyUserDetailServiceImp implements MyUserDetailService {
 
 	@Override
 	public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-		Account account = accountRepository.getAccountByUsername(username).orElse(null);
+		Account account = accountRepository.findByUsername(username).orElse(null);
 		if (account == null)
 			throw new ResourceNotFoundException("Tài khoản hoăc mật khẩu không chính xác");
 		SimpleGrantedAuthority authority = new SimpleGrantedAuthority("ROLE_" + account.getRole());

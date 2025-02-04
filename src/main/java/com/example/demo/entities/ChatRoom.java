@@ -3,8 +3,7 @@ package com.example.demo.entities;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import java.util.UUID;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -15,6 +14,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Inheritance;
 import jakarta.persistence.InheritanceType;
 import jakarta.persistence.OneToMany;
+import jakarta.persistence.PrePersist;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -36,7 +36,6 @@ public abstract class ChatRoom {
 	private String chatRoomId;
 	
 	@OneToMany(mappedBy = "chatRoom", cascade = CascadeType.ALL)
-	@JsonIgnore
 	private List<UserChatRoom> userChatRooms = new ArrayList<UserChatRoom>();
 	
 	@Column(name = "created_at")
@@ -44,4 +43,11 @@ public abstract class ChatRoom {
 	
 	@Column(name = "updated_at")
 	private LocalDateTime updatedAt;
+	
+	@PrePersist
+	public void prePersist() {
+		this.chatRoomId = UUID.randomUUID().toString();
+		this.createdAt = LocalDateTime.now();
+		this.updatedAt = LocalDateTime.now();
+	}
 }

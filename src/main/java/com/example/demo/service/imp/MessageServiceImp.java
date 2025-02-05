@@ -1,5 +1,8 @@
 package com.example.demo.service.imp;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import com.example.demo.entities.ChatRoom;
@@ -39,6 +42,13 @@ public class MessageServiceImp implements MessageService {
 	@Override
 	public Message findNewMessageByChatRoomId(String chatRoomId) {
 		return messageRepository.findNewMessageByChatRoomId(chatRoomId).orElse(null);
+	}
+
+	@Override
+	public Page<Message> findMessagesByChatRoomId(String chatRoomId, int page, int size, String sortField,
+			String sortDirection) {
+		Sort sort = Sort.by(sortDirection.equalsIgnoreCase("asc") ? Sort.Direction.ASC : Sort.Direction.DESC, sortField);
+		return messageRepository.findAllByChatRoomId(chatRoomId, PageRequest.of(page, size, sort));
 	}
 
 }

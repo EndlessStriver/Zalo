@@ -21,4 +21,5 @@ public class ChatGroup extends ChatRoom{
 	
 	@Column(name = "room_image")
 	private String roomImage;
+
 }

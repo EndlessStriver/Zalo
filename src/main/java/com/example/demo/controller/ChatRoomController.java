@@ -14,8 +14,10 @@ import com.example.demo.dto.ResponseDataSuccess;
 import com.example.demo.entities.Account;
 import com.example.demo.entities.ChatRoom;
 import com.example.demo.entities.ChatSingle;
+import com.example.demo.entities.Message;
 import com.example.demo.service.ChatRoomService;
 import com.example.demo.service.ChatSingleService;
+import com.example.demo.service.MessageService;
 import com.example.demo.unit.MethodUnit;
 
 import jakarta.servlet.http.HttpServletRequest;
@@ -26,14 +28,28 @@ public class ChatRoomController {
 
     private ChatRoomService chatroomService;
     private ChatSingleService chatSingleService;
+    private MessageService messageService;
     private MethodUnit methodUnit;
 
-    public ChatRoomController(ChatRoomService chatroomService, ChatSingleService chatSingleService,
-            MethodUnit methodUnit) {
-        this.chatroomService = chatroomService;
-        this.chatSingleService = chatSingleService;
-        this.methodUnit = methodUnit;
-    }
+	public ChatRoomController(ChatRoomService chatroomService, ChatSingleService chatSingleService,
+			MessageService messageService, MethodUnit methodUnit) {
+		this.chatroomService = chatroomService;
+		this.chatSingleService = chatSingleService;
+		this.messageService = messageService;
+		this.methodUnit = methodUnit;
+	}
+    
+    @GetMapping
+	public ResponseEntity<?> getChatRooms(HttpServletRequest request) {
+		Account account = methodUnit.getAccountFromToken(request);
+		List<ChatRoom> chatRooms = chatroomService.findMyChatRooms(account.getUser().getUserId());
+		for (ChatRoom chatRoom : chatRooms) {
+			Message newMessage = messageService.findNewMessageByChatRoomId(chatRoom.getChatRoomId());
+			chatRoom.setNewMessage(newMessage);
+		}
+		return ResponseEntity.status(HttpStatus.OK).body(new ResponseDataSuccess<List<ChatRoom>>(HttpStatus.OK.value(),
+				"Lấy danh sách nhóm đang tham gia thành công", chatRooms));
+	}
 
     @GetMapping("/search")
     public ResponseEntity<?> getChatRoomsByRoomNameAndUserId(@RequestParam String roomName, HttpServletRequest request) {

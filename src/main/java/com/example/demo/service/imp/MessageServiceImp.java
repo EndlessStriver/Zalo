@@ -3,6 +3,7 @@ package com.example.demo.service.imp;
 import org.springframework.stereotype.Service;
 
 import com.example.demo.entities.ChatRoom;
+import com.example.demo.entities.Message;
 import com.example.demo.entities.TextMessage;
 import com.example.demo.entities.User;
 import com.example.demo.repository.MessageRepository;
@@ -33,6 +34,11 @@ public class MessageServiceImp implements MessageService {
 		message.setUser(sender);
 		message.setContent(text);
 		return messageRepository.save(message);
+	}
+
+	@Override
+	public Message findNewMessageByChatRoomId(String chatRoomId) {
+		return messageRepository.findNewMessageByChatRoomId(chatRoomId).orElse(null);
 	}
 
 }

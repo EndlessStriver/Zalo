@@ -3,6 +3,8 @@ package com.example.demo.entities;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.DiscriminatorColumn;
 import jakarta.persistence.DiscriminatorType;
@@ -39,6 +41,7 @@ public abstract class Message {
 	
 	@ManyToOne
 	@JoinColumn(name = "chat_room")
+	@JsonIgnore
 	private ChatRoom chatRoom;
 	
 	@Column(name = "timestamp")
@@ -48,5 +51,11 @@ public abstract class Message {
 	public void prePersist() {
 		this.messageId = UUID.randomUUID().toString();
 		this.timestamp = LocalDateTime.now();
+	}
+
+	public Message(String messageId, LocalDateTime timestamp) {
+		super();
+		this.messageId = messageId;
+		this.timestamp = timestamp;
 	}
 }

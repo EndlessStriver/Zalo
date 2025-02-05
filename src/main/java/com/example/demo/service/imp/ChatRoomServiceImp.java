@@ -18,13 +18,18 @@ public class ChatRoomServiceImp implements ChatRoomService {
 	}
 
 	@Override
-	public List<ChatRoom> findMyChatRoomsByRoomName(String userId, String roomName) {
-		return chatRoomRepository.findByUserIdAndRoomName(userId, roomName);
+	public List<ChatRoom> findMyChatRoomsByRoomName(String myId, String roomName) {
+		return chatRoomRepository.findByUserIdAndRoomName(myId, roomName);
 	}
 
 	@Override
 	public ChatRoom findById(String chatRoomId) {
 		return chatRoomRepository.findById(chatRoomId).orElse(null);
+	}
+
+	@Override
+	public List<ChatRoom> findMyChatRooms(String myId) {
+		return chatRoomRepository.findMyChatRooms(myId);
 	}
 
 }

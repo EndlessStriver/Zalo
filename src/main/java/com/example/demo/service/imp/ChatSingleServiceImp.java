@@ -29,7 +29,7 @@ public class ChatSingleServiceImp implements ChatSingleService {
 	public ChatSingle createChatRoomForUsers(String myId, String friendId) {
 		ChatSingle chatSingle = new ChatSingle();
 		
-		User myUser = userService.findById(friendId);
+		User myUser = userService.findById(myId);
 		User friendUser = userService.findById(friendId);
 		
 		UserChatRoomSingle userChatRoomSingle1 = new UserChatRoomSingle(myUser, chatSingle);

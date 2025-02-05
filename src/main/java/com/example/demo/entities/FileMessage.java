@@ -1,5 +1,7 @@
 package com.example.demo.entities;
 
+import java.time.LocalDateTime;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.DiscriminatorValue;
 import jakarta.persistence.Entity;
@@ -17,5 +19,11 @@ public class FileMessage extends Message {
 	
 	@Column(name = "type_file")
 	private String typeFile;
+
+	public FileMessage(String messageId, LocalDateTime timestamp, String fileUrl, String typeFile) {
+		super(messageId, timestamp);
+		this.fileUrl = fileUrl;
+		this.typeFile = typeFile;
+	}
 	
 }

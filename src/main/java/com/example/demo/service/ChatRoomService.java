@@ -10,4 +10,6 @@ public interface ChatRoomService {
 	
 	ChatRoom findById (String chatRoomId);
 	
+	List<ChatRoom> findMyChatRooms(String myId);
+	
 }

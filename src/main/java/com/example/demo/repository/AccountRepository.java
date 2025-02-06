@@ -17,6 +17,16 @@ public interface AccountRepository extends JpaRepository<Account, String> {
 				WHERE ac.username = :username
 			""")
 	Optional<Account> findByUsername(@Param("username") String username);
+	
+	@Query("""
+			    SELECT CASE WHEN count(ac) > 0
+			        THEN true
+			        ELSE false
+			    END
+			    FROM Account ac
+			    WHERE ac.username = :username
+			""")
+	boolean existsByUsername(String username);
 
 	@Query("""
 				SELECT CASE WHEN count(ac) > 0

@@ -44,6 +44,10 @@ public class RegisterRequest {
 	@Past(message = "Ngày sinh không được lớn hơn ngày hiện tại")	
 	private LocalDate birthday;
 	
+	@NotBlank(message = "Số điện thoại không được để trống")
+	@Pattern(regexp = "(84|0[3|5|7|8|9])+([0-9]{8})\\b", message = "Số điện thoại không hợp lệ")
+	private String phoneNumber;
+	
 	@NotBlank(message = "Email không được để trống")
 	@Email(message = "Email không hợp lệ")
 	private String email;

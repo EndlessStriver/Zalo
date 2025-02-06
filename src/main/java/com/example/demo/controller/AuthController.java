@@ -15,7 +15,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.example.demo.dto.EmailRequest;
 import com.example.demo.dto.LoginRequest;
-import com.example.demo.dto.LoginResponse;
 import com.example.demo.dto.OTPRequest;
 import com.example.demo.dto.RefreshTokenResponse;
 import com.example.demo.dto.RegisterRequest;
@@ -70,10 +69,11 @@ public class AuthController {
 			return ResponseEntity.status(HttpStatus.BAD_REQUEST)
 					.body(new ResponseErrorForm(HttpStatus.BAD_REQUEST.value(), "Đăng nhập thất bại", errors));
 		}
-
+		
 		Account account = accountService.login(loginRequest);
-
+		String accessToken = jwtService.generateToken(account.getUsername(), TokenType.ACCESS);
 		String refreshToken = jwtService.generateToken(account.getUsername(), TokenType.REFRESH);
+		account.setAccessToken(accessToken);
 
 		Cookie cookie = new Cookie("refreshToken", refreshToken);
 		cookie.setHttpOnly(true);
@@ -83,8 +83,8 @@ public class AuthController {
 
 		httpServletResponse.addCookie(cookie);
 
-		return ResponseEntity.status(HttpStatus.OK).body(new ResponseDataSuccess<LoginResponse>(HttpStatus.OK.value(),
-				"Đăng nhập thành công", convertAccountToLoginResponse(account)));
+		return ResponseEntity.status(HttpStatus.OK).body(new ResponseDataSuccess<Account>(HttpStatus.OK.value(),
+				"Đăng nhập thành công", account));
 	}
 
 	@GetMapping("/logout")
@@ -201,22 +201,6 @@ public class AuthController {
 
 	private int generateOTP() {
 		return (int) (Math.floor((Math.random() * 900000)) + 100000);
-	}
-
-	private LoginResponse convertAccountToLoginResponse(Account account) {
-
-		LoginResponse loginResponse = new LoginResponse();
-		loginResponse.setAccountId(account.getAccountId());
-		loginResponse.setUsername(account.getUsername());
-		loginResponse.setRole(account.getRole());
-		loginResponse.setActived(account.isActived());
-		loginResponse.setVerified(account.isVerified());
-		loginResponse.setUser(account.getUser());
-		loginResponse.setCreatedAt(account.getCreatedAt());
-		loginResponse.setUpdatedAt(account.getUpdatedAt());
-		loginResponse.setAccessToken(jwtService.generateToken(account.getUsername(), TokenType.ACCESS));
-
-		return loginResponse;
 	}
 
 }

@@ -19,6 +19,13 @@ public interface UserRepository extends JpaRepository<User, String> {
 				WHERE u.email = :email
 			""")
 	boolean checkEmailIsExists(@Param("email") String email);
+	
+	@Query("""
+			    SELECT COUNT(u) > 0
+			    FROM User u
+			    WHERE u.phoneNumber = :phoneNumber
+			""")
+	boolean checkPhoneNumberIsExists(String phoneNumber);
 
 	@Query(value = """
 				SELECT u.*

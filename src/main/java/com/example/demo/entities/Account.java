@@ -5,6 +5,8 @@ import java.util.UUID;
 
 import com.example.demo.entities.enums.RoleAccount;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -16,6 +18,7 @@ import jakarta.persistence.OneToOne;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.PreUpdate;
 import jakarta.persistence.Table;
+import jakarta.persistence.Transient;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -44,10 +47,10 @@ public class Account {
 	@Column(name = "role", nullable = false)
 	private RoleAccount role;
 	
-	@Column(name = "is_active")
+	@Column(name = "is_active", nullable = false)
 	private boolean actived;
 	
-	@Column(name = "is_verified")
+	@Column(name = "is_verified", nullable = false)
 	private boolean verified;
 	
 	@OneToOne(mappedBy = "account", cascade = CascadeType.ALL)
@@ -58,6 +61,11 @@ public class Account {
 	
 	@Column(name = "updated_at")
 	private LocalDateTime updatedAt;
+	
+	@Transient
+	@JsonInclude(JsonInclude.Include.NON_NULL)
+	@JsonProperty("accessToken")
+	private String accessToken;
 	
 	@PrePersist
 	public void prePersist() {

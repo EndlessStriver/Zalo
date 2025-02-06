@@ -69,8 +69,12 @@ public class AccountServiceImp implements AccountService {
 	public Account register(RegisterRequest registerRequest) {
 		
 		boolean emailExist = userRepository.checkEmailIsExists(registerRequest.getEmail());
+		boolean phoneNumberExist = userRepository.checkPhoneNumberIsExists(registerRequest.getPhoneNumber());
+		boolean usernameExist = accountRepository.existsByUsername(registerRequest.getUsername());
 		
-		if(emailExist) throw new ConflictException("Email đã tồn tại!");
+		if(emailExist) throw new ConflictException("Email đã được sử dụng!");
+		if(phoneNumberExist) throw new ConflictException("Số điện thoại đã được sử dụng!");
+		if(usernameExist) throw new ConflictException("Tên đăng nhập đã tồn tại!");
 		
 		Account account = new Account();
 		account.setUsername(registerRequest.getUsername());
@@ -83,6 +87,7 @@ public class AccountServiceImp implements AccountService {
 		user.setGender(Gender.valueOf(registerRequest.getGender()));
 		user.setBirthday(registerRequest.getBirthday());
 		user.setEmail(registerRequest.getEmail());
+		user.setPhoneNumber(registerRequest.getPhoneNumber());
 		user.setAccount(account);
 		
 		account.setUser(user);

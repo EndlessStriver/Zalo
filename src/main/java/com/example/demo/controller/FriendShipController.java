@@ -43,9 +43,9 @@ public class FriendShipController {
     }
 
     @GetMapping("/check")
-    public ResponseEntity<?> checkFriendshipByPhoneNumber(@RequestParam String phoneNumber, HttpServletRequest request) {
+    public ResponseEntity<?> checkFriendshipByPhoneNumber(@RequestParam String friendId, HttpServletRequest request) {
         Account sender = methodUnit.getAccountFromToken(request);
-        FriendType friendType = friendShipService.checkFriendshipByPhoneNumber(phoneNumber, sender.getUser().getUserId());
+        FriendType friendType = friendShipService.checkFriendshipByPhoneNumber(sender.getUser().getUserId(), friendId);
         return ResponseEntity.status(HttpStatus.OK).body(new ResponseDataSuccess<>(
                 HttpStatus.OK.value(), "Kiểm tra quan hệ bạn bè thành công", friendType));
     }

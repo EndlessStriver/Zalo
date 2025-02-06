@@ -100,8 +100,9 @@ public class FriendShipServiceImp implements FriendShipService {
 	}
 
 	@Override
-	public FriendType checkFriendshipByPhoneNumber(String phoneNumber, String senderId) {
-		return friendShipRepository.checkFriendTypeByPhoneNumberAndSenderId(phoneNumber, senderId);
+	public FriendType checkFriendshipByPhoneNumber(String myId, String friendId) {
+		if (myId.equals(friendId)) return FriendType.IS_YOU;
+		return friendShipRepository.checkFriendTypeByPhoneNumberAndSenderId(myId, friendId);
 	}
 
 }

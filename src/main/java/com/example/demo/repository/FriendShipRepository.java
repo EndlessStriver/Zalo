@@ -55,21 +55,19 @@ public interface FriendShipRepository extends JpaRepository<FriendShip, String> 
 			""")
 	List<FriendShip> findByUserIdAndStatus(@Param("userId") String userId, @Param("status") FriendShipStatus status);
 
-	@Query(value = """
-				SELECT CASE
-				WHEN u.user_id = :senderId THEN 'IS_YOU'
-				WHEN fs.friend_ship_id IS NULL THEN 'NOT_FRIEND'
-				WHEN fs.friend_ship_id IS NOT NULL AND fs.status = 0 AND fs.`user` = :senderId THEN 'REQUEST_SENT'
-				WHEN fs.friend_ship_id IS NOT NULL AND fs.status = 0 AND fs.friend = :senderId THEN 'REQUEST_RECEIVED'
-				WHEN fs.friend_ship_id IS NOT NULL AND fs.status = 1 THEN 'FRIEND'
-				ELSE '???'
-				END AS friendType
-				FROM user u
-				LEFT JOIN friend_ship fs ON u.user_id = fs.`user` OR u.user_id = fs.friend
-				WHERE u.phone_number = :phoneNumber
-			""", nativeQuery = true)
-	FriendType checkFriendTypeByPhoneNumberAndSenderId(@Param("phoneNumber") String phoneNumber,
-			@Param("senderId") String senderId);
+	@Query("""
+			    SELECT CASE
+			    WHEN u.userId = :myId OR f.userId = :myId AND fs.status = 1 THEN 'FRIEND'
+			    WHEN u.userId = :myId AND f.userId = :friendId AND fs.status = 0 THEN 'REQUEST_SENT'
+			    WHEN u.userId = :friendId AND f.userId = :myId AND fs.status = 0 THEN 'REQUEST_RECEIVED'
+			    ELSE 'NOT_FRIEND'
+			    END
+			    FROM FriendShip fs
+			    JOIN fs.user u
+			    JOIN fs.friend f
+			    WHERE (u.userId = :friendId OR f.userId = :friendId)
+			""")
+	FriendType checkFriendTypeByPhoneNumberAndSenderId(@Param("myId") String myId, @Param("friendId") String friendId);
 
 	@Query("""
 				SELECT fs FROM FriendShip fs

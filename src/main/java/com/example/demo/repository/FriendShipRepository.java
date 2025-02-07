@@ -56,16 +56,20 @@ public interface FriendShipRepository extends JpaRepository<FriendShip, String> 
 	List<FriendShip> findByUserIdAndStatus(@Param("userId") String userId, @Param("status") FriendShipStatus status);
 
 	@Query("""
-			    SELECT CASE
-			    WHEN u.userId = :myId OR f.userId = :myId AND fs.status = 1 THEN 'FRIEND'
-			    WHEN u.userId = :myId AND f.userId = :friendId AND fs.status = 0 THEN 'REQUEST_SENT'
-			    WHEN u.userId = :friendId AND f.userId = :myId AND fs.status = 0 THEN 'REQUEST_RECEIVED'
-			    ELSE 'NOT_FRIEND'
-			    END
-			    FROM FriendShip fs
-			    JOIN fs.user u
-			    JOIN fs.friend f
-			    WHERE (u.userId = :friendId OR f.userId = :friendId)
+			    SELECT COALESCE((
+				    SELECT CASE
+				        WHEN (u.userId = :myId AND f.userId = :friendId AND fs.status = 1) 
+				          OR (f.userId = :myId AND u.userId = :friendId AND fs.status = 1) THEN 'FRIEND'
+				        WHEN u.userId = :myId AND f.userId = :friendId AND fs.status = 0 THEN 'REQUEST_SENT'
+				        WHEN u.userId = :friendId AND f.userId = :myId AND fs.status = 0 THEN 'REQUEST_RECEIVED'
+				        ELSE 'NOT_FRIEND'
+				    END
+				    FROM FriendShip fs
+				    JOIN fs.user u
+				    JOIN fs.friend f
+				    WHERE (u.userId = :myId OR f.userId = :myId)
+				    AND (u.userId = :friendId OR f.userId = :friendId)
+				), 'NOT_FRIEND') AS friendship_status
 			""")
 	FriendType checkFriendTypeByPhoneNumberAndSenderId(@Param("myId") String myId, @Param("friendId") String friendId);
 

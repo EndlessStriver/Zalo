@@ -25,4 +25,6 @@ public interface AccountService {
 	void verifyByEmail(String email);
 	
 	boolean checkExistUsername(String username);
+	
+	Account updateAccount(Account account);
 }

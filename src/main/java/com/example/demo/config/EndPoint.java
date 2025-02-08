@@ -10,8 +10,10 @@ public class EndPoint {
 	public static String[] PUBLIC_METHODS_POST = 
 		{ 
 			"/api/v1/auth/login", 
+			"/api/v1/auth/send-otp",
 			"/api/v1/auth/register", 
 			"/api/v1/auth/verify-otp", 
 		};
+	public static String[] PUBLIC_METHODS_PATCH = { "/api/v1/auth/forgot-password" };
 
 }

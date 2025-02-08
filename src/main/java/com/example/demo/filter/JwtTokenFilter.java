@@ -94,6 +94,12 @@ public class JwtTokenFilter extends OncePerRequestFilter {
 		for (String endpoint : EndPoint.ALLOWED_PATHS) {
 			if (pathMatcher.match(endpoint, requestURI)) return true;
 		}
+		
+		if (requestMethod.equals("PATCH")) {
+			for (String endpoint : EndPoint.PUBLIC_METHODS_PATCH) {
+				if (pathMatcher.match(endpoint, requestURI) && requestMethod.equals("PATCH")) return true;
+			}
+		}
 
 		if (requestMethod.equals("POST")) {
 			for (String endpoint : EndPoint.PUBLIC_METHODS_POST) {

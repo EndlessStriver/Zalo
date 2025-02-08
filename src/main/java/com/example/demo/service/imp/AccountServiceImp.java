@@ -118,4 +118,9 @@ public class AccountServiceImp implements AccountService {
 	public boolean checkExistUsername(String username) {
 		return accountRepository.existsByUsername(username);
 	}
+
+	@Override
+	public Account updateAccount(Account account) {
+		return accountRepository.save(account);
+    }
 }

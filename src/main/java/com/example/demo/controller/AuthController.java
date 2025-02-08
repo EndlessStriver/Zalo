@@ -6,14 +6,17 @@ import java.util.Map;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.example.demo.dto.EmailRequest;
+import com.example.demo.dto.ForgotPasswordRequest;
 import com.example.demo.dto.LoginRequest;
 import com.example.demo.dto.OTPRequest;
 import com.example.demo.dto.RefreshTokenResponse;
@@ -44,16 +47,46 @@ public class AuthController {
 	private EmailService emailService;
 	private RedisService redisService;
 	private JwtService jwtService;
+	private BCryptPasswordEncoder bCryptPasswordEncoder;
 
 	@Value("${spring.mail.username}")
 	private String emailSystem;
 
 	public AuthController(AccountService accountService, EmailService emailService, RedisService redisService,
-			JwtService jwtService) {
+			JwtService jwtService, BCryptPasswordEncoder bCryptPasswordEncoder) {
 		this.accountService = accountService;
 		this.emailService = emailService;
 		this.redisService = redisService;
 		this.jwtService = jwtService;
+		this.bCryptPasswordEncoder = bCryptPasswordEncoder;
+	}
+
+	@PatchMapping("/forgot-password")
+	public ResponseEntity<?> forgotPassword(@Valid @RequestBody ForgotPasswordRequest forgotPasswordRequest,
+			BindingResult result) throws MessagingException {
+
+		if (result.hasErrors()) {
+			Map<String, String> errors = new HashMap<String, String>();
+			result.getFieldErrors().stream().forEach(error -> {
+				errors.put(error.getField(), error.getDefaultMessage());
+			});
+
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
+					new ResponseErrorForm(HttpStatus.BAD_REQUEST.value(), "Đổi mật khẩu không thành công", errors));
+		}
+
+		Account account = accountService.findByEmail(forgotPasswordRequest.getEmail());
+		String myOTP = (String) redisService.get(String.format("otp?email=%s", forgotPasswordRequest.getEmail()));
+
+		if (!forgotPasswordRequest.getOtp().equals(myOTP)) {
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+					.body(new ResponseError(HttpStatus.BAD_REQUEST.value(), "Mã OTP không đúng hoặc đã hết hạn"));
+		}
+
+		account.setPassword(bCryptPasswordEncoder.encode(forgotPasswordRequest.getPassword()));
+		Account newAccount = accountService.updateAccount(account);
+		return ResponseEntity.status(HttpStatus.OK)
+				.body(new ResponseDataSuccess<Account>(HttpStatus.OK.value(), "Đổi mật khẩu thành công", newAccount));
 	}
 
 	@PostMapping("/login")
@@ -69,7 +102,7 @@ public class AuthController {
 			return ResponseEntity.status(HttpStatus.BAD_REQUEST)
 					.body(new ResponseErrorForm(HttpStatus.BAD_REQUEST.value(), "Đăng nhập thất bại", errors));
 		}
-		
+
 		Account account = accountService.login(loginRequest);
 		String accessToken = jwtService.generateToken(account.getUsername(), TokenType.ACCESS);
 		String refreshToken = jwtService.generateToken(account.getUsername(), TokenType.REFRESH);
@@ -83,8 +116,8 @@ public class AuthController {
 
 		httpServletResponse.addCookie(cookie);
 
-		return ResponseEntity.status(HttpStatus.OK).body(new ResponseDataSuccess<Account>(HttpStatus.OK.value(),
-				"Đăng nhập thành công", account));
+		return ResponseEntity.status(HttpStatus.OK)
+				.body(new ResponseDataSuccess<Account>(HttpStatus.OK.value(), "Đăng nhập thành công", account));
 	}
 
 	@GetMapping("/logout")
@@ -115,8 +148,8 @@ public class AuthController {
 					.body(new ResponseErrorForm(HttpStatus.BAD_REQUEST.value(), "Đăng kí thất bại", errors));
 		}
 
-		return ResponseEntity.status(HttpStatus.CREATED).body(new ResponseDataSuccess<Account>(HttpStatus.CREATED.value(),
-				"Đăng ký thành công", accountService.register(registerRequest)));
+		return ResponseEntity.status(HttpStatus.CREATED).body(new ResponseDataSuccess<Account>(
+				HttpStatus.CREATED.value(), "Đăng ký thành công", accountService.register(registerRequest)));
 	}
 
 	@PostMapping("/send-otp")

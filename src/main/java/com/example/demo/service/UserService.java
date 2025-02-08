@@ -11,5 +11,11 @@ public interface UserService {
 	User findByPhoneNumber(String phoneNumber, String userId);
 	
 	User findById(String userId);
+	
+	User updateProfile(User user);
+	
+	boolean checkPhoneNumberExist(String phoneNumber);
+	
+	boolean checkEmailExist(String email);
 
 }

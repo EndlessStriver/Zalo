@@ -32,4 +32,19 @@ public class UserServiceImp implements UserService {
 		return userRepository.findById(userId).orElse(null);
 	}
 
+	@Override
+	public User updateProfile(User user) {
+		return userRepository.save(user);
+    }
+
+	@Override
+	public boolean checkPhoneNumberExist(String phoneNumber) {
+		return userRepository.checkPhoneNumberIsExists(phoneNumber);
+	}
+
+	@Override
+	public boolean checkEmailExist(String email) {
+		return userRepository.checkEmailIsExists(email);
+	}
+
 }

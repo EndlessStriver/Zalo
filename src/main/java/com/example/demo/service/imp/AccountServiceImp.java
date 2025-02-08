@@ -20,19 +20,20 @@ import com.example.demo.exception.ResourceNotFoundException;
 import com.example.demo.repository.AccountRepository;
 import com.example.demo.repository.UserRepository;
 import com.example.demo.service.AccountService;
+import com.example.demo.service.UserService;
 
 @Service
 public class AccountServiceImp implements AccountService {
 	
 	private AccountRepository accountRepository;
-	private UserRepository userRepository;
+	private UserService userService;
 	private AuthenticationManager authenticationManager;
 	private BCryptPasswordEncoder bCryptPasswordEncoder;
 	
-	public AccountServiceImp(AccountRepository accountRepository, UserRepository userRepository,
+	public AccountServiceImp(AccountRepository accountRepository, UserService userService,
 			AuthenticationManager authenticationManager, BCryptPasswordEncoder bCryptPasswordEncoder) {
 		this.accountRepository = accountRepository;
-		this.userRepository = userRepository;
+		this.userService = userService;
 		this.authenticationManager = authenticationManager;
 		this.bCryptPasswordEncoder = bCryptPasswordEncoder;
 	}
@@ -68,8 +69,8 @@ public class AccountServiceImp implements AccountService {
 	@Override
 	public Account register(RegisterRequest registerRequest) {
 		
-		boolean emailExist = userRepository.checkEmailIsExists(registerRequest.getEmail());
-		boolean phoneNumberExist = userRepository.checkPhoneNumberIsExists(registerRequest.getPhoneNumber());
+		boolean emailExist = userService.checkEmailExist(registerRequest.getEmail());
+		boolean phoneNumberExist = userService.checkPhoneNumberExist(registerRequest.getPhoneNumber());
 		boolean usernameExist = accountRepository.existsByUsername(registerRequest.getUsername());
 		
 		if(emailExist) throw new ConflictException("Email đã được sử dụng!");
@@ -111,5 +112,10 @@ public class AccountServiceImp implements AccountService {
 		if(account == null) throw new ResourceNotFoundException("Không tìm thấy tài khoản liên kết với email: " + email);
 		account.setVerified(true);
 		accountRepository.save(account);
+	}
+
+	@Override
+	public boolean checkExistUsername(String username) {
+		return accountRepository.existsByUsername(username);
 	}
 }

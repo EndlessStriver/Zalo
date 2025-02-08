@@ -23,5 +23,6 @@ public interface AccountService {
 	boolean isAccountVerifiedByEmail(boolean verify, String email);
 	
 	void verifyByEmail(String email);
-
+	
+	boolean checkExistUsername(String username);
 }

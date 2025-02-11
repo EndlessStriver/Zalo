@@ -1,7 +1,5 @@
 package com.example.demo.entities;
 
-import java.time.LocalDateTime;
-
 import jakarta.persistence.Column;
 import jakarta.persistence.DiscriminatorValue;
 import jakarta.persistence.Entity;
@@ -16,12 +14,7 @@ import lombok.Setter;
 @DiscriminatorValue("text_message")
 public class TextMessage extends Message {
 	
-	@Column(name = "content")
+	@Column(name = "content", nullable = false)
 	private String content;
-
-	public TextMessage(String messageId, LocalDateTime timestamp, String content) {
-		super(messageId, timestamp);
-		this.content = content;
-	}
 	
 }

@@ -32,30 +32,24 @@ import lombok.Setter;
 public abstract class Message {
 	
 	@Id
-	@Column(name = "message_id")
+	@Column(name = "message_id", nullable = false)
 	private String messageId;
 	
 	@ManyToOne
-	@JoinColumn(name = "user_id")
+	@JoinColumn(name = "user_id", nullable = false)
 	private User user;
 	
 	@ManyToOne
-	@JoinColumn(name = "chat_room")
+	@JoinColumn(name = "chat_room", nullable = false)
 	@JsonIgnore
 	private ChatRoom chatRoom;
 	
-	@Column(name = "timestamp")
+	@Column(name = "timestamp", nullable = false)
 	private LocalDateTime timestamp;
 	
 	@PrePersist
 	public void prePersist() {
 		this.messageId = UUID.randomUUID().toString();
 		this.timestamp = LocalDateTime.now();
-	}
-
-	public Message(String messageId, LocalDateTime timestamp) {
-		super();
-		this.messageId = messageId;
-		this.timestamp = timestamp;
 	}
 }

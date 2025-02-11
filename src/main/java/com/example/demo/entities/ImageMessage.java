@@ -1,7 +1,5 @@
 package com.example.demo.entities;
 
-import java.time.LocalDateTime;
-
 import jakarta.persistence.Column;
 import jakarta.persistence.DiscriminatorValue;
 import jakarta.persistence.Entity;
@@ -14,16 +12,10 @@ import lombok.Setter;
 @DiscriminatorValue("image_message")
 public class ImageMessage extends Message {
 	
-	@Column(name = "image_url")
+	@Column(name = "image_url", nullable = false)
 	private String imageUrl;
 	
-	@Column(name = "type_image")
+	@Column(name = "type_image", nullable = false)
 	private String typeImage;
 
-	public ImageMessage(String messageId, LocalDateTime timestamp, String imageUrl, String typeImage) {
-		super(messageId, timestamp);
-		this.imageUrl = imageUrl;
-		this.typeImage = typeImage;
-	}
-	
 }

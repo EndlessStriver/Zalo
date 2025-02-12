@@ -18,7 +18,6 @@ import com.example.demo.exception.AuthenticationException;
 import com.example.demo.exception.ConflictException;
 import com.example.demo.exception.ResourceNotFoundException;
 import com.example.demo.repository.AccountRepository;
-import com.example.demo.repository.UserRepository;
 import com.example.demo.service.AccountService;
 import com.example.demo.service.UserService;
 

@@ -41,9 +41,14 @@ public class S3ServiceImp implements S3Service {
 		return "https://" + BUCKET_NAME + ".s3.amazonaws.com/" + fileName;
 	}
 
-	public void deleteFile(String fileName) {
+	public void deleteFile(String fileUrl) {
+		String fileName = getFileNameFromUrl(fileUrl);
 		DeleteObjectRequest deleteObjectRequest = DeleteObjectRequest.builder().bucket(BUCKET_NAME).key(fileName)
 				.build();
 		s3Client.deleteObject(deleteObjectRequest);
+	}
+	
+	private String getFileNameFromUrl(String url) {
+		return url.substring(url.lastIndexOf("/") + 1);
 	}
 }

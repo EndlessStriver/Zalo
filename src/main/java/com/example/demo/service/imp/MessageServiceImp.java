@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.example.demo.entities.ChatRoom;
+import com.example.demo.entities.FileMessage;
 import com.example.demo.entities.ImageMessage;
 import com.example.demo.entities.Message;
 import com.example.demo.entities.TextMessage;
@@ -80,6 +81,29 @@ public class MessageServiceImp implements MessageService {
 			return messageRepository.save(message);			
 		} catch (Exception e) {
 			if (imageUrl != "") s3Service.deleteFile(imageUrl);
+			throw e;
+		}
+	}
+
+	@Override
+	public FileMessage createFileMessage(MultipartFile file, String senderId, String chatRoomId) throws Exception {
+		String fileUrl = "";
+		try {
+			User sender = userService.findById(senderId);
+			ChatRoom chatRoom = chatRoomService.findById(chatRoomId);
+			
+			if(sender == null) throw new ResourceNotFoundException("Không tìm thấy người dùng với id: " + senderId);
+			if(chatRoom == null) throw new ResourceNotFoundException("Không tìm thấy nhóm chát với id: " + chatRoomId);
+			
+			fileUrl = s3Service.uploadFile(file);
+			FileMessage message = new FileMessage();
+			message.setChatRoom(chatRoom);
+			message.setUser(sender);
+			message.setFileUrl(fileUrl);
+			message.setTypeFile(file.getContentType());
+			return messageRepository.save(message);			
+		} catch (Exception e) {
+			if (fileUrl != "") s3Service.deleteFile(fileUrl);
 			throw e;
 		}
 	}

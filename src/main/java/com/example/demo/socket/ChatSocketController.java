@@ -12,7 +12,7 @@ import com.example.demo.service.MessageService;
 @Controller
 public class ChatSocketController {
 
-	private final SimpMessagingTemplate messagingTemplate;
+	private SimpMessagingTemplate messagingTemplate;
 	private MessageService messageService;
 
 	public ChatSocketController(SimpMessagingTemplate messagingTemplate, MessageService messageService) {

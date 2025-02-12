@@ -17,6 +17,7 @@ import com.example.demo.entities.Account;
 import com.example.demo.entities.FileMessage;
 import com.example.demo.entities.ImageMessage;
 import com.example.demo.entities.Message;
+import com.example.demo.entities.TextMessage;
 import com.example.demo.service.MessageService;
 import com.example.demo.unit.MethodUnit;
 
@@ -35,6 +36,17 @@ public class MessageController {
 		this.messageService = messageService;
 		this.methodUnit = methodUnit;
 		this.messagingTemplate = messagingTemplate;
+	}
+	
+	@PostMapping("/text")
+	public ResponseEntity<?> createMessageText(@RequestParam(required = true) String chatRoomId,
+			@RequestParam(required = true) String content, HttpServletRequest httpServletRequest) throws Exception {
+		Account account = methodUnit.getAccountFromToken(httpServletRequest);
+		TextMessage imageMessage = messageService.createMessageText(content, account.getUser().getUserId(), chatRoomId);
+		messagingTemplate.convertAndSend("/private/chat/" + chatRoomId, imageMessage);
+		ResponseDataSuccess<TextMessage> responseDataSuccess = new ResponseDataSuccess<TextMessage>(
+				HttpStatus.OK.value(), "Tạo tin nhắn văn bản thành công", imageMessage);
+		return ResponseEntity.status(HttpStatus.OK).body(responseDataSuccess);
 	}
 
 	@PostMapping("/images")

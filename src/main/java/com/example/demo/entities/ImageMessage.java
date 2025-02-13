@@ -12,10 +12,13 @@ import lombok.Setter;
 @DiscriminatorValue("image_message")
 public class ImageMessage extends Message {
 	
-	@Column(name = "image_url", nullable = false)
+	@Column(name = "image_url", nullable = true)
 	private String imageUrl;
 	
-	@Column(name = "type_image", nullable = false)
+	@Column(name = "image_name", nullable = true)
+	private String imageName;
+	
+	@Column(name = "type_image", nullable = true)
 	private String typeImage;
 
 }

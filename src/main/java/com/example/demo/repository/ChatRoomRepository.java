@@ -27,8 +27,7 @@ public interface ChatRoomRepository extends JpaRepository<ChatRoom, String> {
 				)
 				
 				SELECT cr.chat_room_id, cr.created_at, cr.updated_at, cr.type, cr.room_image, cr.room_name, lm.message_id, lm.timestamp, lm.chat_room, 
-				       lm.user_id, lm.content, lm.image_url, lm.type_image, lm.audio_url,
-				       lm.type_audio, lm.file_url, lm.type_file 
+				       lm.user_id, lm.content, lm.image_url, lm.type_image, lm.file_url, lm.type_file 
 				FROM chat_room cr
 				JOIN user_chat_room ucr ON cr.chat_room_id = ucr.chat_room_id
 				JOIN LASTMESSAGE lm on cr.chat_room_id = lm.chat_room

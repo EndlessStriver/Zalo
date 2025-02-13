@@ -78,6 +78,7 @@ public class MessageServiceImp implements MessageService {
 			message.setUser(sender);
 			message.setImageUrl(imageUrl);
 			message.setTypeImage(image.getContentType());
+			message.setImageName(image.getOriginalFilename());
 			return messageRepository.save(message);			
 		} catch (Exception e) {
 			if (imageUrl != "") s3Service.deleteFile(imageUrl);
@@ -101,6 +102,7 @@ public class MessageServiceImp implements MessageService {
 			message.setUser(sender);
 			message.setFileUrl(fileUrl);
 			message.setTypeFile(file.getContentType());
+			message.setFileName(file.getOriginalFilename());
 			return messageRepository.save(message);			
 		} catch (Exception e) {
 			if (fileUrl != "") s3Service.deleteFile(fileUrl);

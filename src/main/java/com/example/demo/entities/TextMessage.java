@@ -14,7 +14,7 @@ import lombok.Setter;
 @DiscriminatorValue("text_message")
 public class TextMessage extends Message {
 	
-	@Column(name = "content", nullable = false)
+	@Column(name = "content", nullable = true)
 	private String content;
 	
 }

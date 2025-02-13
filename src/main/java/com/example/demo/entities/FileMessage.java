@@ -12,10 +12,13 @@ import lombok.Setter;
 @DiscriminatorValue("file_message")
 public class FileMessage extends Message {
 	
-	@Column(name = "file_url")
+	@Column(name = "file_url", nullable = true)
 	private String fileUrl;
 	
-	@Column(name = "type_file")
+	@Column(name = "file_name", nullable = true)
+	private String fileName;
+	
+	@Column(name = "type_file", nullable = true)
 	private String typeFile;
 	
 }
